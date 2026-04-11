@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexora App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css?v=1" />
+</head>
+<body>
+
+  <!-- ===== LOGIN SCREEN ===== -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-bg">
+      <div class="login-bg__orb login-bg__orb--1"></div>
+      <div class="login-bg__orb login-bg__orb--2"></div>
+      <div class="login-bg__orb login-bg__orb--3"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-card__logo">
+        <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+          <defs><linearGradient id="lgLogin" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+          <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#lgLogin)"/>
+          <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span>Nexora</span>
+      </div>
+      <h1 class="login-card__title">Welcome back</h1>
+      <p class="login-card__subtitle">Sign in to your account to continue</p>
+      <form class="login-card__form" id="loginForm">
+        <div class="login-field">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="you@company.com" value="ricky@nexora.io" required />
+        </div>
+        <div class="login-field">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" value="password" required />
+        </div>
+        <div class="login-row">
+          <label class="login-check"><input type="checkbox" checked /> Remember me</label>
+          <a href="#" class="login-forgot">Forgot password?</a>
+        </div>
+        <button type="submit" class="login-btn">Sign In</button>
+      </form>
+      <p class="login-card__footer">Don't have an account? <a href="index.html#pricing">Get Started</a></p>
+    </div>
+  </div>
+
+  <!-- ===== APP SHELL ===== -->
+  <div class="app" id="appShell" style="display:none">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__logo">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <defs><linearGradient id="lgSidebar" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+          <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#lgSidebar)"/>
+          <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="sidebar__logo-text">Nexora</span>
+      </div>
+
+      <nav class="sidebar__nav">
+        <div class="sidebar__section-label">Overview</div>
+        <a href="#dashboard" class="sidebar__link active" data-page="dashboard">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <div class="sidebar__section-label">Project Management</div>
+        <a href="#projects" class="sidebar__link" data-page="projects">
+          <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>Projects</span>
+        </a>
+        <a href="#kanban" class="sidebar__link" data-page="kanban">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="15" rx="1"/></svg>
+          <span>Kanban Board</span>
+        </a>
+        <a href="#risks" class="sidebar__link" data-page="risks">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Risks</span>
+        </a>
+
+        <div class="sidebar__section-label">PMO Intelligence</div>
+        <a href="#delivery" class="sidebar__link" data-page="delivery">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Delivery Metrics</span>
+        </a>
+        <a href="#warnings" class="sidebar__link" data-page="warnings">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>Early Warnings</span>
+          <span class="sidebar__badge">5</span>
+        </a>
+        <a href="#priority" class="sidebar__link" data-page="priority">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+          <span>Priority Matrix</span>
+        </a>
+
+        <div class="sidebar__section-label">Product</div>
+        <a href="#okr" class="sidebar__link" data-page="okr">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          <span>OKR</span>
+        </a>
+        <a href="#roadmap" class="sidebar__link" data-page="roadmap">
+          <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          <span>Roadmap</span>
+        </a>
+
+        <div class="sidebar__section-label">Support</div>
+        <a href="#team" class="sidebar__link" data-page="team">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Team Members</span>
+        </a>
+        <a href="#ai" class="sidebar__link" data-page="ai">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>AI Assistant</span>
+        </a>
+        <a href="#settings" class="sidebar__link" data-page="settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <a href="index.html" class="sidebar__link sidebar__link--muted">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>Back to Website</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Area -->
+    <div class="app__main">
+      <!-- Header -->
+      <header class="app-header" id="appHeader">
+        <button class="app-header__burger" id="sidebarToggle" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="app-header__search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search projects, tasks, people..." id="globalSearch" />
+        </div>
+        <div class="app-header__actions">
+          <button class="app-header__icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="app-header__notif-dot" id="notifDot"></span>
+          </button>
+          <div class="app-header__user" id="headerUser">
+            <div class="avatar avatar--sm" id="headerAvatar"></div>
+          </div>
+        </div>
+
+        <!-- Notifications Dropdown -->
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-dropdown__header">
+            <h4>Notifications</h4>
+            <button class="notif-dropdown__mark-all" id="markAllRead">Mark all read</button>
+          </div>
+          <div class="notif-dropdown__list" id="notifList"></div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="app-content" id="appContent">
+        <!-- Rendered by JS router -->
+      </main>
+    </div>
+  </div>
+
+  <script src="js/app-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

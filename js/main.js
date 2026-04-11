@@ -1,0 +1,798 @@
+/* ============================================
+   NEXORA — Main JavaScript
+   Particles · Scroll Reveals · Parallax · Magnetic Cursor · Content Rendering
+   ============================================ */
+
+;(function () {
+  "use strict";
+
+  // ---- Content ----
+  const C = ContentManager.getContent();
+
+  // ---- Icon SVGs ----
+  const ICONS = {
+    shield: `<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    zap: `<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+    globe: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+    puzzle: `<svg viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 1 0-3.214 3.214c.446.166.855.497.925.968a.979.979 0 0 1-.276.837l-1.611 1.611a2.407 2.407 0 0 1-1.704.706 2.407 2.407 0 0 1-1.704-.706l-1.568-1.568a1.026 1.026 0 0 0-.878-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 1 1-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 0 0-.289-.878l-1.568-1.568A2.407 2.407 0 0 1 1 12c0-.617.236-1.234.706-1.704L3.317 8.685a.98.98 0 0 1 .837-.276c.47.07.802.48.968.925a2.501 2.501 0 1 0 3.214-3.214c-.446-.166-.855-.497-.925-.968a.979.979 0 0 1 .276-.837l1.611-1.611A2.407 2.407 0 0 1 11 2.998c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.878.29.493-.074.84-.504 1.02-.968a2.5 2.5 0 1 1 3.237 3.237c-.464.18-.894.527-.967 1.02z"/></svg>`,
+    brain: `<svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v1a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v1a3 3 0 0 0 3 3h1a4 4 0 0 0 8 0h1a3 3 0 0 0 3-3v-1a3 3 0 0 0 0-6v-1a3 3 0 0 0-3-3V6a4 4 0 0 0-4-4z"/><path d="M12 2v20"/></svg>`,
+    workflow: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M6 9v3a3 3 0 0 0 3 3h3"/><path d="M15 12h-3"/></svg>`,
+    layers: `<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+    lock: `<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+    chart: `<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+    code: `<svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    mail: `<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
+    phone: `<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+    mapPin: `<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+    twitter: `<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+    github: `<svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>`,
+    linkedin: `<svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
+  };
+
+  function getIcon(name) {
+    return ICONS[name] || ICONS.zap;
+  }
+
+  // ============================================
+  // RENDER CONTENT
+  // ============================================
+
+  function renderContent() {
+    // Nav
+    const navLinks = document.getElementById("navLinks");
+    navLinks.innerHTML = C.nav.links
+      .map((l) => `<a href="${l.href}" class="nav__link">${l.label}</a>`)
+      .join("");
+
+    const mobileMenuLinks = document.getElementById("mobileMenuLinks");
+    mobileMenuLinks.innerHTML = C.nav.links
+      .map((l) => `<a href="${l.href}" class="mobile-menu__link">${l.label}</a>`)
+      .join("") + `<a href="http://localhost:8080" class="mobile-menu__link" style="color:var(--accent-1)" target="_blank">Login</a>`;
+
+    // Hero
+    document.getElementById("heroBadge").innerHTML = `<span class="hero__badge-dot"></span><span>${C.hero.badge}</span>`;
+    document.getElementById("heroHeadline").textContent = C.hero.headline;
+    document.getElementById("heroSub").textContent = C.hero.subheadline;
+    document.getElementById("heroPrimaryCta").textContent = C.hero.primaryCta;
+    document.getElementById("heroPrimaryCta").href = C.hero.primaryCtaHref;
+    document.getElementById("heroSecondaryCta").querySelector("span:last-child") ||
+      (document.getElementById("heroSecondaryCta").innerHTML =
+        `<span class="btn__play-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><polygon points="6,3 18,10 6,17"/></svg></span>${C.hero.secondaryCta}`);
+    document.getElementById("heroSecondaryCta").href = C.hero.secondaryCtaHref;
+
+    const heroStats = document.getElementById("heroStats");
+    heroStats.innerHTML = C.hero.stats
+      .map(
+        (s) => `
+      <div class="hero__stat">
+        <div class="hero__stat-value">${s.value}</div>
+        <div class="hero__stat-label">${s.label}</div>
+      </div>`
+      )
+      .join("");
+
+    // About
+    document.getElementById("aboutBadge").textContent = C.about.badge;
+    document.getElementById("aboutHeadline").textContent = C.about.headline;
+    document.getElementById("aboutDesc").textContent = C.about.description;
+    const aboutGrid = document.getElementById("aboutGrid");
+    aboutGrid.innerHTML = C.about.highlights
+      .map(
+        (h) => `
+      <div class="about__card reveal-up">
+        <div class="about__card-icon">${getIcon(h.icon)}</div>
+        <h3 class="about__card-title">${h.title}</h3>
+        <p class="about__card-desc">${h.description}</p>
+      </div>`
+      )
+      .join("");
+
+    // Features
+    document.getElementById("featuresBadge").textContent = C.features.badge;
+    document.getElementById("featuresHeadline").textContent = C.features.headline;
+    document.getElementById("featuresDesc").textContent = C.features.description;
+    const featuresGrid = document.getElementById("featuresGrid");
+    featuresGrid.innerHTML = C.features.items
+      .map(
+        (f) => `
+      <div class="feature-card reveal-up" style="--card-accent: ${f.color}">
+        <div class="feature-card__icon" style="color: ${f.color}">${getIcon(f.icon)}</div>
+        <h3 class="feature-card__title">${f.title}</h3>
+        <p class="feature-card__desc">${f.description}</p>
+      </div>`
+      )
+      .join("");
+
+    // How It Works
+    document.getElementById("hiwBadge").textContent = C.howItWorks.badge;
+    document.getElementById("hiwHeadline").textContent = C.howItWorks.headline;
+    document.getElementById("hiwDesc").textContent = C.howItWorks.description;
+    const hiwTimeline = document.getElementById("hiwTimeline");
+    hiwTimeline.innerHTML =
+      `<div class="hiw__timeline-progress" id="hiwProgress"></div>` +
+      C.howItWorks.steps
+        .map(
+          (s) => `
+      <div class="hiw__step">
+        <div class="hiw__step-number">${s.number}</div>
+        <h3 class="hiw__step-title">${s.title}</h3>
+        <p class="hiw__step-desc">${s.description}</p>
+      </div>`
+        )
+        .join("");
+
+    // Testimonials
+    document.getElementById("testBadge").textContent = C.testimonials.badge;
+    document.getElementById("testHeadline").textContent = C.testimonials.headline;
+    const testTrack = document.getElementById("testTrack");
+    testTrack.innerHTML = C.testimonials.items
+      .map(
+        (t) => `
+      <div class="testimonial-card">
+        <p class="testimonial-card__quote">${t.quote}</p>
+        <div class="testimonial-card__author">
+          <div class="testimonial-card__avatar">${t.author.charAt(0)}</div>
+          <div>
+            <div class="testimonial-card__name">${t.author}</div>
+            <div class="testimonial-card__role">${t.role}</div>
+          </div>
+        </div>
+      </div>`
+      )
+      .join("");
+
+    const testDots = document.getElementById("testDots");
+    testDots.innerHTML = C.testimonials.items
+      .map(
+        (_, i) =>
+          `<button class="testimonials__dot${i === 0 ? " active" : ""}" data-index="${i}" aria-label="Testimonial ${i + 1}"></button>`
+      )
+      .join("");
+
+    // Pricing
+    document.getElementById("pricingBadge").textContent = C.pricing.badge;
+    document.getElementById("pricingHeadline").textContent = C.pricing.headline;
+    document.getElementById("pricingDesc").textContent = C.pricing.description;
+    const pricingGrid = document.getElementById("pricingGrid");
+    pricingGrid.innerHTML = C.pricing.plans
+      .map(
+        (p) => `
+      <div class="pricing-card${p.highlighted ? " pricing-card--highlighted" : ""} reveal-up">
+        ${p.highlighted ? '<div class="pricing-card__popular">Most Popular</div>' : ""}
+        <div class="pricing-card__name">${p.name}</div>
+        <div class="pricing-card__price">
+          <span class="pricing-card__amount">${p.price}</span>
+          <span class="pricing-card__period">${p.period}</span>
+        </div>
+        <p class="pricing-card__desc">${p.description}</p>
+        <ul class="pricing-card__features">
+          ${p.features.map((f) => `<li>${f}</li>`).join("")}
+        </ul>
+        <a href="#" class="btn ${p.highlighted ? "btn--primary" : "btn--ghost"} btn--full">${p.cta}</a>
+      </div>`
+      )
+      .join("");
+
+    // CTA
+    document.getElementById("ctaHeadline").textContent = C.cta.headline;
+    document.getElementById("ctaDesc").textContent = C.cta.description;
+    document.getElementById("ctaPrimary").textContent = C.cta.primaryCta;
+    document.getElementById("ctaPrimary").href = C.cta.primaryCtaHref;
+    document.getElementById("ctaSecondary").textContent = C.cta.secondaryCta;
+    document.getElementById("ctaSecondary").href = C.cta.secondaryCtaHref;
+
+    // Contact
+    document.getElementById("contactBadge").textContent = C.contact.badge;
+    document.getElementById("contactHeadline").textContent = C.contact.headline;
+    document.getElementById("contactDesc").textContent = C.contact.description;
+    document.getElementById("contactInfo").innerHTML = `
+      <div class="contact__info-item">
+        <div class="contact__info-icon">${getIcon("mail")}</div>
+        <div><div class="contact__info-label">Email</div><div class="contact__info-value">${C.contact.email}</div></div>
+      </div>
+      <div class="contact__info-item">
+        <div class="contact__info-icon">${getIcon("phone")}</div>
+        <div><div class="contact__info-label">Phone</div><div class="contact__info-value">${C.contact.phone}</div></div>
+      </div>
+      <div class="contact__info-item">
+        <div class="contact__info-icon">${getIcon("mapPin")}</div>
+        <div><div class="contact__info-label">Address</div><div class="contact__info-value">${C.contact.address}</div></div>
+      </div>
+    `;
+
+    // Footer
+    document.getElementById("footerDesc").textContent = C.footer.description;
+    document.getElementById("footerCopyright").textContent = `© ${C.footer.copyright}`;
+
+    const footerSocials = document.getElementById("footerSocials");
+    footerSocials.innerHTML = C.footer.socials
+      .map(
+        (s) =>
+          `<a href="${s.href}" class="footer__social-link" aria-label="${s.platform}">${getIcon(s.platform)}</a>`
+      )
+      .join("");
+
+    const footerColumns = document.getElementById("footerColumns");
+    footerColumns.innerHTML = C.footer.columns
+      .map(
+        (col) => `
+      <div>
+        <h4 class="footer__col-title">${col.title}</h4>
+        <div class="footer__col-links">
+          ${col.links.map((l) => `<a href="${l.href}" class="footer__col-link">${l.label}</a>`).join("")}
+        </div>
+      </div>`
+      )
+      .join("");
+  }
+
+  // ============================================
+  // PARTICLE CANVAS
+  // ============================================
+
+  function initParticles() {
+    const canvas = document.getElementById("heroCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let mouse = { x: -1000, y: -1000 };
+    let rafId;
+
+    function resize() {
+      canvas.width = canvas.offsetWidth * devicePixelRatio;
+      canvas.height = canvas.offsetHeight * devicePixelRatio;
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+    }
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.offsetWidth;
+        this.y = Math.random() * canvas.offsetHeight;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.speedY = (Math.random() - 0.5) * 0.4;
+        this.opacity = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // mouse repulsion
+        const dx = this.x - mouse.x;
+        const dy = this.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          const force = (120 - dist) / 120;
+          this.x += (dx / dist) * force * 2;
+          this.y += (dy / dist) * force * 2;
+        }
+
+        if (this.x < 0 || this.x > canvas.offsetWidth) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.offsetHeight) this.speedY *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
+        ctx.fill();
+      }
+    }
+
+    function init() {
+      resize();
+      const count = Math.min(Math.floor((canvas.offsetWidth * canvas.offsetHeight) / 8000), 150);
+      particles = Array.from({ length: count }, () => new Particle());
+    }
+
+    function drawLines() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(99, 102, 241, ${0.06 * (1 - dist / 150)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+      particles.forEach((p) => {
+        p.update();
+        p.draw();
+      });
+      drawLines();
+      rafId = requestAnimationFrame(animate);
+    }
+
+    canvas.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    });
+
+    window.addEventListener("resize", () => {
+      cancelAnimationFrame(rafId);
+      init();
+      animate();
+    });
+
+    init();
+    animate();
+  }
+
+  // ============================================
+  // CURSOR GLOW
+  // ============================================
+
+  function initCursorGlow() {
+    const glow = document.getElementById("cursorGlow");
+    if (!glow || window.matchMedia("(pointer: coarse)").matches) return;
+
+    let cx = -1000,
+      cy = -1000,
+      gx = -1000,
+      gy = -1000;
+
+    document.addEventListener("mousemove", (e) => {
+      cx = e.clientX;
+      cy = e.clientY;
+    });
+
+    function tick() {
+      gx += (cx - gx) * 0.08;
+      gy += (cy - gy) * 0.08;
+      glow.style.transform = `translate(${gx - 300}px, ${gy - 300}px)`;
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  // ============================================
+  // SCROLL PROGRESS BAR
+  // ============================================
+
+  function initScrollProgress() {
+    const bar = document.createElement("div");
+    bar.className = "scroll-progress";
+    document.body.prepend(bar);
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+        bar.style.transform = `scaleX(${progress})`;
+      },
+      { passive: true }
+    );
+  }
+
+  // ============================================
+  // NAVIGATION SCROLL
+  // ============================================
+
+  function initNav() {
+    const nav = document.getElementById("nav");
+    const burger = document.getElementById("navBurger");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        nav.classList.toggle("nav--scrolled", window.scrollY > 50);
+      },
+      { passive: true }
+    );
+
+    burger.addEventListener("click", () => {
+      burger.classList.toggle("active");
+      mobileMenu.classList.toggle("active");
+      document.body.style.overflow = mobileMenu.classList.contains("active")
+        ? "hidden"
+        : "";
+    });
+
+    // close mobile on link click
+    mobileMenu.querySelectorAll("a").forEach((a) =>
+      a.addEventListener("click", () => {
+        burger.classList.remove("active");
+        mobileMenu.classList.remove("active");
+        document.body.style.overflow = "";
+      })
+    );
+
+    // smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach((a) =>
+      a.addEventListener("click", (e) => {
+        const target = document.querySelector(a.getAttribute("href"));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth" });
+        }
+      })
+    );
+  }
+
+  // ============================================
+  // SCROLL REVEAL (IntersectionObserver)
+  // ============================================
+
+  function initScrollReveal() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -60px 0px" }
+    );
+
+    document.querySelectorAll(".reveal-up").forEach((el) => observer.observe(el));
+  }
+
+  // ============================================
+  // HOW IT WORKS — SCROLL-DRIVEN TIMELINE
+  // ============================================
+
+  function initTimeline() {
+    const steps = document.querySelectorAll(".hiw__step");
+    const progress = document.getElementById("hiwProgress");
+    const timeline = document.querySelector(".hiw__timeline");
+    if (!timeline || !progress || !steps.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    steps.forEach((s) => observer.observe(s));
+
+    // animate progress bar on scroll
+    window.addEventListener(
+      "scroll",
+      () => {
+        const rect = timeline.getBoundingClientRect();
+        const viewH = window.innerHeight;
+        if (rect.top > viewH || rect.bottom < 0) return;
+        const scrolled = Math.min(1, Math.max(0, (viewH - rect.top) / (rect.height + viewH * 0.3)));
+        progress.style.height = `${scrolled * 100}%`;
+      },
+      { passive: true }
+    );
+  }
+
+  // ============================================
+  // TESTIMONIALS CAROUSEL
+  // ============================================
+
+  function initCarousel() {
+    const track = document.getElementById("testTrack");
+    const dots = document.querySelectorAll(".testimonials__dot");
+    if (!track || !dots.length) return;
+
+    let current = 0;
+    let interval;
+
+    function goTo(i) {
+      current = i;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, idx) => d.classList.toggle("active", idx === current));
+    }
+
+    function next() {
+      goTo((current + 1) % dots.length);
+    }
+
+    function startAuto() {
+      interval = setInterval(next, 5000);
+    }
+
+    dots.forEach((dot) =>
+      dot.addEventListener("click", () => {
+        clearInterval(interval);
+        goTo(parseInt(dot.dataset.index));
+        startAuto();
+      })
+    );
+
+    // swipe support
+    let startX;
+    track.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].clientX;
+      clearInterval(interval);
+    }, { passive: true });
+
+    track.addEventListener("touchend", (e) => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        diff > 0 ? goTo(Math.min(current + 1, dots.length - 1)) : goTo(Math.max(current - 1, 0));
+      }
+      startAuto();
+    }, { passive: true });
+
+    startAuto();
+  }
+
+  // ============================================
+  // MAGNETIC HOVER ON BUTTONS
+  // ============================================
+
+  function initMagnetic() {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
+    document.querySelectorAll(".btn--primary, .btn--white").forEach((btn) => {
+      btn.addEventListener("mousemove", (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+      });
+
+      btn.addEventListener("mouseleave", () => {
+        btn.style.transform = "";
+      });
+    });
+  }
+
+  // ============================================
+  // CARD MOUSE TRACKING (radial gradient follows cursor)
+  // ============================================
+
+  function initCardMouseTracking() {
+    document.querySelectorAll(".about__card, .feature-card").forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty("--mouse-x", `${x}%`);
+        card.style.setProperty("--mouse-y", `${y}%`);
+      });
+    });
+  }
+
+  // ============================================
+  // TILT EFFECT ON FEATURE CARDS
+  // ============================================
+
+  function initTilt() {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
+    document.querySelectorAll(".feature-card").forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `translateY(-6px) perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+  }
+
+  // ============================================
+  // TEXT COUNTER ANIMATION (hero stats)
+  // ============================================
+
+  function initCounters() {
+    const stats = document.querySelectorAll(".hero__stat-value");
+    if (!stats.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const text = el.textContent;
+          const match = text.match(/^([\d.]+)(.*)$/);
+          if (!match) return;
+
+          const target = parseFloat(match[1]);
+          const suffix = match[2];
+          const duration = 1500;
+          const start = performance.now();
+
+          function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            // ease out cubic
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const current = target * ease;
+            el.textContent =
+              (target % 1 !== 0 ? current.toFixed(1) : Math.floor(current)) + suffix;
+            if (progress < 1) requestAnimationFrame(tick);
+          }
+
+          requestAnimationFrame(tick);
+          observer.unobserve(el);
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    stats.forEach((s) => observer.observe(s));
+  }
+
+  // ============================================
+  // PARALLAX SUBTLE
+  // ============================================
+
+  function initParallax() {
+    const hero = document.querySelector(".hero__content");
+    if (!hero) return;
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const scroll = window.scrollY;
+        if (scroll < window.innerHeight) {
+          hero.style.transform = `translateY(${scroll * 0.15}px)`;
+          hero.style.opacity = 1 - scroll / (window.innerHeight * 0.8);
+        }
+      },
+      { passive: true }
+    );
+  }
+
+  // ============================================
+  // CONTACT FORM (mock)
+  // ============================================
+
+  function initContactForm() {
+    const form = document.getElementById("contactForm");
+    if (!form) return;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const btn = form.querySelector("button[type=submit]");
+      btn.textContent = "Sent!";
+      btn.style.background = "linear-gradient(135deg, #22c55e, #16a34a)";
+      setTimeout(() => {
+        btn.textContent = "Send Message";
+        btn.style.background = "";
+        form.reset();
+      }, 2500);
+    });
+  }
+
+  // ============================================
+  // CMS LINK
+  // ============================================
+
+  function addCmsLink() {
+    const link = document.createElement("a");
+    link.href = "cms.html";
+    link.className = "cms-link";
+    link.textContent = "CMS";
+    link.title = "Open Content Management System";
+    document.body.appendChild(link);
+  }
+
+  // ============================================
+  // ROLE SELECTION MODAL
+  // ============================================
+
+  function initRoleModal() {
+    const modal = document.getElementById("roleModal");
+    const backdrop = document.getElementById("roleBackdrop");
+    const closeBtn = document.getElementById("roleClose");
+    const options = document.getElementById("roleOptions");
+    if (!modal) return;
+
+    function openModal(e) {
+      e.preventDefault();
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    // Intercept all "Get Started" / "Start Free Trial" links that point to app.html
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest('a[href*="app.html#login"]');
+      if (link && !link.closest(".role-modal")) {
+        openModal(e);
+      }
+    });
+
+    // Close modal
+    if (backdrop) backdrop.addEventListener("click", closeModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+
+    // Role selection → redirect to app login
+    if (options) {
+      options.addEventListener("click", (e) => {
+        const btn = e.target.closest(".role-option");
+        if (!btn) return;
+
+        const role = btn.dataset.role;
+
+        // Visual feedback
+        btn.style.background = "rgba(99, 102, 241, 0.15)";
+        btn.style.borderColor = "var(--accent-1)";
+
+        // Store selected role
+        localStorage.setItem("nexora_onboard_role", role);
+
+        // Map role to default landing page in app
+        const rolePages = {
+          pm: "dashboard",
+          product: "okr",
+          pmo: "delivery",
+          developer: "kanban",
+          other: "dashboard",
+        };
+
+        const targetPage = rolePages[role] || "dashboard";
+
+        // Redirect to real pm-dashboard product
+        setTimeout(() => {
+          closeModal();
+          window.open("http://localhost:8080", "_blank");
+        }, 300);
+      });
+    }
+
+    // ESC to close
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+    });
+  }
+
+  // ============================================
+  // INIT
+  // ============================================
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderContent();
+    initParticles();
+    initCursorGlow();
+    initScrollProgress();
+    initNav();
+
+    // small delay to let DOM settle after rendering
+    requestAnimationFrame(() => {
+      initScrollReveal();
+      initTimeline();
+      initCarousel();
+      initMagnetic();
+      initCardMouseTracking();
+      initTilt();
+      initCounters();
+      initParallax();
+      initContactForm();
+      addCmsLink();
+      initRoleModal();
+    });
+  });
+})();

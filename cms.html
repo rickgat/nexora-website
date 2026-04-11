@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexora CMS — Content Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* CMS Admin Styles */
+    :root {
+      --bg: #0f0f14;
+      --bg-card: #16161f;
+      --bg-input: #1c1c28;
+      --border: rgba(255,255,255,0.08);
+      --border-focus: #6366f1;
+      --text: #f0f0f5;
+      --text-secondary: #8888a0;
+      --text-muted: #55556a;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --radius: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* Layout */
+    .cms-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .sidebar__logo {
+      width: 32px;
+      height: 32px;
+    }
+
+    .sidebar__title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar__label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      padding: 12px 20px 6px;
+    }
+
+    .sidebar__nav {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar__link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar__link:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .sidebar__link.active {
+      color: var(--accent);
+      background: rgba(99,102,241,0.08);
+      border-right: 2px solid var(--accent);
+    }
+
+    .sidebar__link svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* Main */
+    .cms-main {
+      padding: 32px 40px;
+      max-width: 900px;
+    }
+
+    .cms-main__title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .cms-main__subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    /* Form */
+    .form-section {
+      margin-bottom: 32px;
+    }
+
+    .form-section__title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-row--full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Array editor */
+    .array-editor {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .array-item {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      background: var(--bg-card);
+      transition: background 0.2s ease;
+    }
+
+    .array-item:hover {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .array-item:last-child {
+      border-bottom: none;
+    }
+
+    .array-item__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .array-item__title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .array-item__actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.8rem;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--border-focus);
+      color: var(--text);
+    }
+
+    .btn-icon--danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: rgba(239,68,68,0.08);
+    }
+
+    .array-add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      background: none;
+      border: none;
+      border-top: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s ease;
+    }
+
+    .array-add:hover {
+      background: rgba(99,102,241,0.06);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn--primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn--primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn--danger {
+      background: rgba(239,68,68,0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+
+    .btn--danger:hover {
+      background: rgba(239,68,68,0.2);
+    }
+
+    .btn--ghost {
+      background: rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn--ghost:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+
+    /* Actions bar */
+    .actions-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 16px 0;
+      display: flex;
+      gap: 12px;
+      margin-top: 40px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 24px;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 600;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast--success {
+      background: var(--success);
+      color: white;
+    }
+
+    .toast--danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    /* Preview link */
+    .preview-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      margin-left: auto;
+    }
+
+    .preview-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .top-bar__left h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .top-bar__left p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Sub-array (features in plan, links in footer) */
+    .sub-array-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+    }
+
+    .sub-array-item input {
+      flex: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .cms-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .sidebar__nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 0 12px;
+      }
+      .sidebar__link {
+        white-space: nowrap;
+        padding: 8px 14px;
+      }
+      .sidebar__link.active {
+        border-right: none;
+        border-bottom: 2px solid var(--accent);
+      }
+      .sidebar__label {
+        display: none;
+      }
+      .cms-main {
+        padding: 24px 16px;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* ── CMS Login ── */
+    .cms-login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a0a0f 0%, #12102e 40%, #1a1745 100%);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cms-login__orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .cms-login__orb--1 { width: 450px; height: 450px; background: #6366f1; top: -180px; left: -80px; }
+    .cms-login__orb--2 { width: 350px; height: 350px; background: #06b6d4; bottom: -120px; right: -80px; }
+
+    .cms-login__card {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      padding: 44px 36px;
+      background: rgba(22, 22, 31, 0.82);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      animation: cmsLoginIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes cmsLoginIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .cms-login__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f0f0f5;
+      margin-bottom: 28px;
+    }
+
+    .cms-login__title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #f0f0f5;
+      letter-spacing: -0.02em;
+    }
+
+    .cms-login__sub {
+      font-size: 0.85rem;
+      color: rgba(240,240,245,0.5);
+      margin-top: 6px;
+      margin-bottom: 24px;
+    }
+
+    .cms-login__field { margin-bottom: 16px; }
+
+    .cms-login__field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(240,240,245,0.5);
+      margin-bottom: 6px;
+    }
+
+    .cms-login__field input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      color: #f0f0f5;
+      font-size: 0.875rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .cms-login__field input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    }
+
+    .cms-login__field input::placeholder { color: rgba(240,240,245,0.25); }
+
+    .cms-login__btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #6366f1, #818cf8, #06b6d4);
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 8px;
+    }
+
+    .cms-login__btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+    }
+
+    .cms-login__error {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: #fca5a5;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .cms-login__error.show { display: block; }
+
+    .cms-login__footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(240,240,245,0.3);
+      margin-top: 20px;
+    }
+
+    .cms-login__footer a {
+      color: #818cf8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CMS Login -->
+  <div class="cms-login" id="cmsLogin">
+    <div class="cms-login__orb cms-login__orb--1"></div>
+    <div class="cms-login__orb cms-login__orb--2"></div>
+    <div class="cms-login__card">
+      <div class="cms-login__logo">
+        <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+          <defs><linearGradient id="lgCmsLogin" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+          <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#lgCmsLogin)"/>
+          <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span>Nexora CMS</span>
+      </div>
+      <h1 class="cms-login__title">Content Management</h1>
+      <p class="cms-login__sub">Sign in to manage website content</p>
+      <div class="cms-login__error" id="cmsLoginError">Invalid credentials. Please try again.</div>
+      <form id="cmsLoginForm">
+        <div class="cms-login__field">
+          <label>Username</label>
+          <input type="text" id="cmsLoginUser" placeholder="Enter username" required autocomplete="username" />
+        </div>
+        <div class="cms-login__field">
+          <label>Password</label>
+          <input type="password" id="cmsLoginPass" placeholder="Enter password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="cms-login__btn">Sign In</button>
+      </form>
+      <p class="cms-login__footer"><a href="index.html">Back to Website</a></p>
+    </div>
+  </div>
+
+  <div class="cms-layout" id="cmsLayout" style="display:none">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <svg class="sidebar__logo" viewBox="0 0 32 32" fill="none">
+          <defs><linearGradient id="cg" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+          <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#cg)"/>
+          <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M2 10C6 4 12 2 18 2H22C14 3 6 6 2 10Z" fill="white" opacity="0.2"/>
+        </svg>
+        <span class="sidebar__title">Nexora CMS</span>
+      </div>
+
+      <div class="sidebar__label">Sections</div>
+      <nav class="sidebar__nav" id="sidebarNav">
+        <button class="sidebar__link active" data-section="hero">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Hero
+        </button>
+        <button class="sidebar__link" data-section="about">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          About
+        </button>
+        <button class="sidebar__link" data-section="features">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Features
+        </button>
+        <button class="sidebar__link" data-section="howItWorks">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          How It Works
+        </button>
+        <button class="sidebar__link" data-section="testimonials">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Testimonials
+        </button>
+        <button class="sidebar__link" data-section="pricing">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Pricing
+        </button>
+        <button class="sidebar__link" data-section="cta">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+          CTA
+        </button>
+        <button class="sidebar__link" data-section="contact">
+          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          Contact
+        </button>
+        <button class="sidebar__link" data-section="nav">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Navigation
+        </button>
+        <button class="sidebar__link" data-section="footer">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+          Footer
+        </button>
+      </nav>
+      <div style="padding:12px 20px;border-top:1px solid var(--border)">
+        <a href="app.html#dashboard" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:0.8rem;font-weight:600;color:var(--accent);background:rgba(99,102,241,0.08);transition:all 0.2s ease;text-decoration:none">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Open App
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="cms-main">
+      <div class="top-bar">
+        <div class="top-bar__left">
+          <h1 id="pageTitle">Hero Section</h1>
+          <p id="pageSubtitle">Edit hero content and call-to-action</p>
+        </div>
+        <a href="index.html" class="preview-link" target="_blank">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Preview Site
+        </a>
+      </div>
+
+      <div id="editorContent"></div>
+
+      <div class="actions-bar">
+        <button class="btn btn--primary" id="saveBtn">Save Changes</button>
+        <button class="btn btn--ghost" id="previewBtn">Preview</button>
+        <button class="btn btn--danger" id="resetBtn">Reset to Default</button>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/content.js"></script>
+  <script src="js/cms.js"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexora — The Future of Innovation</title>
+  <meta name="description" content="Nexora is a next-generation platform that empowers businesses to build, scale, and innovate faster than ever before." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=2" />
+</head>
+<body>
+  <!-- Cursor follower -->
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <!-- Noise overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav__inner container">
+      <a href="#" class="nav__logo" id="navLogo">
+        <span class="nav__logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+            <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#logoGrad)"/>
+            <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M2 10C6 4 12 2 18 2H22C14 3 6 6 2 10Z" fill="white" opacity="0.2"/>
+          </svg>
+        </span>
+        <span class="nav__logo-text">Nexora</span>
+      </a>
+      <div class="nav__links" id="navLinks"></div>
+      <a href="http://localhost:8080" class="nav__link nav__login-link" target="_blank">Login</a>
+      <a href="app.html#login" class="nav__cta btn btn--sm" id="navCta">Get Started</a>
+      <button class="nav__burger" id="navBurger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu__inner" id="mobileMenuLinks"></div>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <canvas class="hero__canvas" id="heroCanvas"></canvas>
+    <div class="hero__gradient"></div>
+    <div class="hero__content container">
+      <div class="hero__badge reveal-up" id="heroBadge">
+        <span class="hero__badge-dot"></span>
+        <span>Introducing Nexora 2.0</span>
+      </div>
+      <h1 class="hero__headline reveal-up" id="heroHeadline"></h1>
+      <p class="hero__sub reveal-up" id="heroSub"></p>
+      <div class="hero__actions reveal-up">
+        <a href="#pricing" class="btn btn--primary btn--lg" id="heroPrimaryCta">Start Free Trial</a>
+        <a href="#" class="btn btn--ghost btn--lg" id="heroSecondaryCta">
+          <span class="btn__play-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><polygon points="6,3 18,10 6,17"/></svg>
+          </span>
+          Watch Demo
+        </a>
+      </div>
+      <div class="hero__stats" id="heroStats"></div>
+    </div>
+    <div class="hero__scroll-indicator">
+      <div class="hero__scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="section__header">
+        <span class="badge reveal-up" id="aboutBadge">Why Nexora</span>
+        <h2 class="section__title reveal-up" id="aboutHeadline"></h2>
+        <p class="section__desc reveal-up" id="aboutDesc"></p>
+      </div>
+      <div class="about__grid" id="aboutGrid"></div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section features" id="features">
+    <div class="container">
+      <div class="section__header">
+        <span class="badge reveal-up" id="featuresBadge">Features</span>
+        <h2 class="section__title reveal-up" id="featuresHeadline"></h2>
+        <p class="section__desc reveal-up" id="featuresDesc"></p>
+      </div>
+      <div class="features__grid" id="featuresGrid"></div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section__header">
+        <span class="badge reveal-up" id="hiwBadge">How It Works</span>
+        <h2 class="section__title reveal-up" id="hiwHeadline"></h2>
+        <p class="section__desc reveal-up" id="hiwDesc"></p>
+      </div>
+      <div class="hiw__timeline" id="hiwTimeline"></div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section testimonials" id="testimonials">
+    <div class="container">
+      <div class="section__header">
+        <span class="badge reveal-up" id="testBadge">Testimonials</span>
+        <h2 class="section__title reveal-up" id="testHeadline"></h2>
+      </div>
+      <div class="testimonials__track-wrapper reveal-up">
+        <div class="testimonials__track" id="testTrack"></div>
+      </div>
+      <div class="testimonials__dots" id="testDots"></div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section pricing" id="pricing">
+    <div class="container">
+      <div class="section__header">
+        <span class="badge reveal-up" id="pricingBadge">Pricing</span>
+        <h2 class="section__title reveal-up" id="pricingHeadline"></h2>
+        <p class="section__desc reveal-up" id="pricingDesc"></p>
+      </div>
+      <div class="pricing__grid" id="pricingGrid"></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section cta-section" id="cta-section">
+    <div class="container">
+      <div class="cta-section__inner reveal-up">
+        <div class="cta-section__orb cta-section__orb--1"></div>
+        <div class="cta-section__orb cta-section__orb--2"></div>
+        <h2 class="cta-section__headline" id="ctaHeadline"></h2>
+        <p class="cta-section__desc" id="ctaDesc"></p>
+        <div class="cta-section__actions">
+          <a href="#pricing" class="btn btn--white btn--lg" id="ctaPrimary">Get Started Free</a>
+          <a href="#contact" class="btn btn--ghost-white btn--lg" id="ctaSecondary">Schedule a Demo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="section__header">
+        <span class="badge reveal-up" id="contactBadge">Contact</span>
+        <h2 class="section__title reveal-up" id="contactHeadline"></h2>
+        <p class="section__desc reveal-up" id="contactDesc"></p>
+      </div>
+      <div class="contact__grid reveal-up">
+        <div class="contact__info" id="contactInfo"></div>
+        <form class="contact__form" id="contactForm">
+          <div class="form-group">
+            <input type="text" placeholder="Your Name" required class="form-input" />
+          </div>
+          <div class="form-group">
+            <input type="email" placeholder="Your Email" required class="form-input" />
+          </div>
+          <div class="form-group">
+            <textarea placeholder="Your Message" rows="5" required class="form-input"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary btn--lg btn--full">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <a href="#" class="nav__logo">
+            <span class="nav__logo-icon">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <defs><linearGradient id="logoGrad2" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+                <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#logoGrad2)"/>
+                <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M2 10C6 4 12 2 18 2H22C14 3 6 6 2 10Z" fill="white" opacity="0.2"/>
+              </svg>
+            </span>
+            <span class="nav__logo-text">Nexora</span>
+          </a>
+          <p class="footer__desc" id="footerDesc"></p>
+          <div class="footer__socials" id="footerSocials"></div>
+        </div>
+        <div class="footer__columns" id="footerColumns"></div>
+      </div>
+      <div class="footer__bottom">
+        <p id="footerCopyright"></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Role Selection Modal -->
+  <div class="role-modal" id="roleModal">
+    <div class="role-modal__backdrop" id="roleBackdrop"></div>
+    <div class="role-modal__card">
+      <button class="role-modal__close" id="roleClose">&times;</button>
+      <div class="role-modal__icon">
+        <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+          <defs><linearGradient id="lgRole" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+          <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#lgRole)"/>
+          <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <h2 class="role-modal__title">What best describes your role?</h2>
+      <p class="role-modal__subtitle">We'll tailor your experience based on your needs</p>
+
+      <div class="role-modal__options" id="roleOptions">
+        <button class="role-option" data-role="pm">
+          <div class="role-option__icon">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="role-option__content">
+            <div class="role-option__title">Project Manager</div>
+            <div class="role-option__desc">Manage projects, tasks, sprints, and team delivery</div>
+          </div>
+          <div class="role-option__arrow">
+            <svg viewBox="0 0 24 24" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </button>
+
+        <button class="role-option" data-role="product">
+          <div class="role-option__icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div class="role-option__content">
+            <div class="role-option__title">Product Manager</div>
+            <div class="role-option__desc">OKRs, roadmaps, personas, feedback, and experiments</div>
+          </div>
+          <div class="role-option__arrow">
+            <svg viewBox="0 0 24 24" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </button>
+
+        <button class="role-option" data-role="pmo">
+          <div class="role-option__icon">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="role-option__content">
+            <div class="role-option__title">PMO / Executive</div>
+            <div class="role-option__desc">Portfolio intelligence, delivery metrics, and early warnings</div>
+          </div>
+          <div class="role-option__arrow">
+            <svg viewBox="0 0 24 24" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </button>
+
+        <button class="role-option" data-role="developer">
+          <div class="role-option__icon">
+            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div class="role-option__content">
+            <div class="role-option__title">Developer / Engineer</div>
+            <div class="role-option__desc">Tasks, Kanban boards, AI assistant, and knowledge base</div>
+          </div>
+          <div class="role-option__arrow">
+            <svg viewBox="0 0 24 24" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </button>
+
+        <button class="role-option role-option--muted" data-role="other">
+          <div class="role-option__icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          </div>
+          <div class="role-option__content">
+            <div class="role-option__title">Just Exploring</div>
+            <div class="role-option__desc">I want to see all features before deciding</div>
+          </div>
+          <div class="role-option__arrow">
+            <svg viewBox="0 0 24 24" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/content.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
