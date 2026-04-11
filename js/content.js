@@ -17,7 +17,7 @@ const DEFAULT_CONTENT = {
       { label: "Contact", href: "#contact" },
     ],
     ctaText: "Get Started",
-    ctaHref: "app.html#login",
+    ctaHref: "/app/#login",
   },
 
   hero: {
@@ -26,7 +26,7 @@ const DEFAULT_CONTENT = {
     subheadline:
       "The enterprise platform for project management, PMO intelligence, and product delivery. From Kanban boards to AI-powered early warnings — everything your team needs in one place.",
     primaryCta: "Start Free Trial",
-    primaryCtaHref: "app.html#login",
+    primaryCtaHref: "/app/#login",
     secondaryCta: "Watch Demo",
     secondaryCtaHref: "#features",
     stats: [
@@ -249,7 +249,7 @@ const DEFAULT_CONTENT = {
     description:
       "Join hundreds of engineering teams who manage projects, track OKRs, and deliver products with Nexora. Start your free 14-day trial today.",
     primaryCta: "Get Started Free",
-    primaryCtaHref: "app.html#login",
+    primaryCtaHref: "/app/#login",
     secondaryCta: "Schedule a Demo",
     secondaryCtaHref: "#contact",
   },
@@ -273,8 +273,8 @@ const DEFAULT_CONTENT = {
         links: [
           { label: "Features", href: "#features" },
           { label: "Pricing", href: "#pricing" },
-          { label: "Kanban Board", href: "app.html#kanban" },
-          { label: "AI Assistant", href: "app.html#ai" },
+          { label: "Kanban Board", href: "/app/#kanban" },
+          { label: "AI Assistant", href: "/app/#ai" },
         ],
       },
       {
@@ -291,7 +291,7 @@ const DEFAULT_CONTENT = {
         links: [
           { label: "Documentation", href: "#" },
           { label: "API Reference", href: "#" },
-          { label: "Knowledge Base", href: "app.html#ai" },
+          { label: "Knowledge Base", href: "/app/#ai" },
           { label: "Status", href: "#" },
         ],
       },

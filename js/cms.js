@@ -723,7 +723,7 @@
     document.getElementById("resetBtn").addEventListener("click", reset);
     document.getElementById("previewBtn").addEventListener("click", () => {
       save();
-      window.open("index.html", "_blank");
+      window.open("/", "_blank");
     });
   });
 })();

@@ -688,7 +688,7 @@
 
   function addCmsLink() {
     const link = document.createElement("a");
-    link.href = "cms.html";
+    link.href = "/cms/";
     link.className = "cms-link";
     link.textContent = "CMS";
     link.title = "Open Content Management System";
@@ -719,7 +719,7 @@
 
     // Intercept all "Get Started" / "Start Free Trial" links that point to app.html
     document.addEventListener("click", (e) => {
-      const link = e.target.closest('a[href*="app.html#login"]');
+      const link = e.target.closest('a[href*="/app/#login"]');
       if (link && !link.closest(".role-modal")) {
         openModal(e);
       }
