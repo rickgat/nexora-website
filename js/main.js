@@ -49,7 +49,7 @@
     const mobileMenuLinks = document.getElementById("mobileMenuLinks");
     mobileMenuLinks.innerHTML = C.nav.links
       .map((l) => `<a href="${l.href}" class="mobile-menu__link">${l.label}</a>`)
-      .join("") + `<a href="http://localhost:8080" class="mobile-menu__link" style="color:var(--accent-1)" target="_blank">Login</a>`;
+      .join("") + `<a href="/app/#login" class="mobile-menu__link" style="color:var(--accent-1)">Login</a>`;
 
     // Hero
     document.getElementById("heroBadge").innerHTML = `<span class="hero__badge-dot"></span><span>${C.hero.badge}</span>`;
@@ -760,7 +760,7 @@
         // Redirect to real pm-dashboard product
         setTimeout(() => {
           closeModal();
-          window.open("http://localhost:8080", "_blank");
+          window.location.href = "/app/#login";
         }, 300);
       });
     }
