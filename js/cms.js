@@ -5,8 +5,11 @@
 ;(function () {
   "use strict";
 
-  let content = ContentManager.getContent();
+  let content = ContentManager.getCachedContent();
   let currentSection = "hero";
+
+  const API_BASE =
+    (typeof window !== "undefined" && window.NEXORA_API_BASE) || "";
 
   const SECTION_META = {
     hero: { title: "Hero Section", subtitle: "Edit hero content, headline, and call-to-action buttons" },
@@ -641,37 +644,43 @@
   }
 
   // ---- Save ----
-  function save() {
+  async function save() {
     collectData();
     processPricingFeatures();
     processFooterLinks();
-    ContentManager.saveContent(content);
-    toast("Changes saved successfully!");
+    try {
+      await ContentManager.saveContent(content);
+      toast("Changes saved successfully!");
+    } catch (e) {
+      const msg = String(e && e.message || e);
+      if (/401|Not signed in|Unauthorized/i.test(msg)) {
+        localStorage.removeItem(ContentManager.AUTH_TOKEN_KEY);
+        showCmsLogin();
+        toast("Session expired. Please sign in again.", "error");
+      } else {
+        toast("Save failed: " + msg, "error");
+      }
+    }
   }
 
   // ---- Reset ----
-  function reset() {
-    if (confirm("Are you sure you want to reset all content to defaults? This cannot be undone.")) {
-      ContentManager.resetContent();
-      content = ContentManager.getContent();
+  async function reset() {
+    if (!confirm("Are you sure you want to reset all content to defaults? This cannot be undone.")) return;
+    try {
+      await ContentManager.resetContent();
+      content = await ContentManager.fetchContent();
       renderEditor();
       toast("Content reset to defaults", "success");
+    } catch (e) {
+      toast("Reset failed: " + (e && e.message || e), "error");
     }
   }
 
   // ---- CMS Auth ----
-  const CMS_SESSION_KEY = "nexora_cms_session";
-  const CMS_CREDENTIALS = {
-    admin: "admin123",
-    editor: "editor123",
-  };
-
+  // Auth goes through pm-dashboard's /api/auth/login. Only users flagged as
+  // platform admin can actually save (server enforces it on PUT).
   function isCmsLoggedIn() {
-    return !!localStorage.getItem(CMS_SESSION_KEY);
-  }
-
-  function cmsLogin(username) {
-    localStorage.setItem(CMS_SESSION_KEY, JSON.stringify({ user: username, ts: Date.now() }));
+    return !!localStorage.getItem(ContentManager.AUTH_TOKEN_KEY);
   }
 
   function showCmsApp() {
@@ -684,30 +693,50 @@
     document.getElementById("cmsLayout").style.display = "none";
   }
 
+  async function attemptLogin(tenant, username, password) {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ tenant, username, password }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || !body.success) {
+      throw new Error(body.error || `HTTP ${res.status}`);
+    }
+    if (!body.is_platform_admin) {
+      throw new Error("This account is not a platform admin.");
+    }
+    return body.token;
+  }
+
   function initCmsLogin() {
     const form = document.getElementById("cmsLoginForm");
     const error = document.getElementById("cmsLoginError");
+    if (!form) return;
 
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const user = document.getElementById("cmsLoginUser").value.trim().toLowerCase();
-        const pass = document.getElementById("cmsLoginPass").value;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const tenant = (document.getElementById("cmsLoginTenant")?.value || "").trim();
+      const user = document.getElementById("cmsLoginUser").value.trim();
+      const pass = document.getElementById("cmsLoginPass").value;
 
-        if (CMS_CREDENTIALS[user] && CMS_CREDENTIALS[user] === pass) {
-          error.classList.remove("show");
-          cmsLogin(user);
-          showCmsApp();
-        } else {
-          error.classList.add("show");
-          document.getElementById("cmsLoginPass").value = "";
-        }
-      });
-    }
+      try {
+        const token = await attemptLogin(tenant || undefined, user, pass);
+        localStorage.setItem(ContentManager.AUTH_TOKEN_KEY, token);
+        error.classList.remove("show");
+        showCmsApp();
+        content = await ContentManager.fetchContent();
+        renderEditor();
+      } catch (err) {
+        error.textContent = err.message || "Sign-in failed.";
+        error.classList.add("show");
+        document.getElementById("cmsLoginPass").value = "";
+      }
+    });
   }
 
   // ---- Init ----
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     initCmsLogin();
 
     if (isCmsLoggedIn()) {
@@ -719,10 +748,18 @@
     initSidebar();
     renderEditor();
 
+    // Pull fresh content from server (even when not signed in — GET is public).
+    try {
+      content = await ContentManager.fetchContent();
+      renderEditor();
+    } catch (e) {
+      console.warn("CMS initial fetch failed:", e);
+    }
+
     document.getElementById("saveBtn").addEventListener("click", save);
     document.getElementById("resetBtn").addEventListener("click", reset);
-    document.getElementById("previewBtn").addEventListener("click", () => {
-      save();
+    document.getElementById("previewBtn").addEventListener("click", async () => {
+      await save();
       window.open("/", "_blank");
     });
   });

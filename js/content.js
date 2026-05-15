@@ -1,4 +1,6 @@
-// Default content for Nexora website — all editable via CMS
+// Default content for Nexora website — used as fallback if API has no data yet.
+// Edits are saved to the pm-dashboard backend (table: site_content) so all
+// visitors see the same content.
 const DEFAULT_CONTENT = {
   meta: {
     siteName: "Nexora",
@@ -305,32 +307,99 @@ const DEFAULT_CONTENT = {
   },
 };
 
-// Content manager — checks localStorage overrides first
-class ContentManager {
-  static STORAGE_KEY = "nexora_cms_content";
+// API base: empty string = same-origin (recommended — proxy /api/... to pm-dashboard).
+// Override at deploy time by setting `window.NEXORA_API_BASE = "https://pm.example.com"`
+// before this script loads if the website and API live on different origins.
+const API_BASE =
+  (typeof window !== "undefined" && window.NEXORA_API_BASE) || "";
 
-  static getContent() {
+// Content manager — fetches from /api/site-content; localStorage is used only as
+// a first-paint cache so visitors see something before the network round-trip
+// completes. Saves go straight to the server.
+class ContentManager {
+  static CACHE_KEY = "nexora_cms_content_cache";
+  static AUTH_TOKEN_KEY = "nexora_cms_token";
+  static SITE_KEY = "main";
+
+  static _endpoint() {
+    return `${API_BASE}/api/site-content/${encodeURIComponent(this.SITE_KEY)}`;
+  }
+
+  /// Synchronous read of the localStorage cache. Used for the initial paint
+  /// before the network fetch completes. Returns defaults merged with cache.
+  static getCachedContent() {
     try {
-      const saved = localStorage.getItem(this.STORAGE_KEY);
-      if (saved) {
-        return this.deepMerge(DEFAULT_CONTENT, JSON.parse(saved));
+      const cached = localStorage.getItem(this.CACHE_KEY);
+      if (cached) {
+        return this.deepMerge(DEFAULT_CONTENT, JSON.parse(cached));
       }
     } catch (e) {
-      console.warn("Failed to load CMS content:", e);
+      console.warn("CMS cache read failed:", e);
     }
     return structuredClone(DEFAULT_CONTENT);
   }
 
-  static saveContent(content) {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(content));
+  /// Async load from the server. Caches the response to localStorage so the
+  /// next visit gets an instant first paint. Falls back to the cache (then
+  /// defaults) if the network call fails.
+  static async fetchContent() {
+    try {
+      const res = await fetch(this._endpoint(), {
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const body = await res.json();
+      if (body && body.success && body.content) {
+        const merged = this.deepMerge(DEFAULT_CONTENT, body.content);
+        try {
+          localStorage.setItem(this.CACHE_KEY, JSON.stringify(body.content));
+        } catch (_) { /* quota — ignore */ }
+        return merged;
+      }
+      return this.getCachedContent();
+    } catch (e) {
+      console.warn("CMS fetch failed, using cache:", e);
+      return this.getCachedContent();
+    }
   }
 
-  static resetContent() {
-    localStorage.removeItem(this.STORAGE_KEY);
+  /// PUT new content to the server. Requires a bearer token from a
+  /// platform-admin login. Throws on failure.
+  static async saveContent(content) {
+    const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
+    if (!token) throw new Error("Not signed in to CMS");
+    const res = await fetch(this._endpoint(), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(content),
+    });
+    if (!res.ok) {
+      let msg = `HTTP ${res.status}`;
+      try {
+        const body = await res.json();
+        if (body && body.error) msg = body.error;
+      } catch (_) { /* ignore parse error */ }
+      throw new Error(msg);
+    }
+    try {
+      localStorage.setItem(this.CACHE_KEY, JSON.stringify(content));
+    } catch (_) { /* ignore */ }
+    return await res.json();
+  }
+
+  /// Reset means "delete the current content row". For safety we just PUT the
+  /// defaults rather than expose a destructive endpoint.
+  static async resetContent() {
+    return this.saveContent(structuredClone(DEFAULT_CONTENT));
   }
 
   static deepMerge(target, source) {
     const output = structuredClone(target);
+    if (!source || typeof source !== "object") return output;
     for (const key of Object.keys(source)) {
       if (
         source[key] &&

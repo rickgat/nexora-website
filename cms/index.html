@@ -641,8 +641,12 @@
       <div class="cms-login__error" id="cmsLoginError">Invalid credentials. Please try again.</div>
       <form id="cmsLoginForm">
         <div class="cms-login__field">
+          <label>Organization slug</label>
+          <input type="text" id="cmsLoginTenant" placeholder="e.g. default" autocomplete="organization" />
+        </div>
+        <div class="cms-login__field">
           <label>Username</label>
-          <input type="text" id="cmsLoginUser" placeholder="Enter username" required autocomplete="username" />
+          <input type="text" id="cmsLoginUser" placeholder="Platform admin username" required autocomplete="username" />
         </div>
         <div class="cms-login__field">
           <label>Password</label>
@@ -743,7 +747,7 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="/js/content.js"></script>
-  <script src="/js/cms.js"></script>
+  <script src="/js/content.js?v=2"></script>
+  <script src="/js/cms.js?v=2"></script>
 </body>
 </html>

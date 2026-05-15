@@ -7,7 +7,9 @@
   "use strict";
 
   // ---- Content ----
-  const C = ContentManager.getContent();
+  // Starts from the localStorage cache (or DEFAULT_CONTENT) so the first paint
+  // is instant; the init flow swaps in fresh server data and re-renders.
+  let C = ContentManager.getCachedContent();
 
   // ---- Icon SVGs ----
   const ICONS = {
@@ -794,5 +796,27 @@
       addCmsLink();
       initRoleModal();
     });
+
+    // Pull fresh content from the API in the background. If it differs from
+    // the cached version, re-render so visitors see the latest CMS edits
+    // without waiting for a second page load.
+    ContentManager.fetchContent()
+      .then((fresh) => {
+        if (JSON.stringify(fresh) === JSON.stringify(C)) return;
+        C = fresh;
+        renderContent();
+        requestAnimationFrame(() => {
+          initScrollReveal();
+          initTimeline();
+          initCarousel();
+          initMagnetic();
+          initCardMouseTracking();
+          initTilt();
+          initCounters();
+          initParallax();
+          initContactForm();
+        });
+      })
+      .catch((e) => console.warn("CMS refresh failed:", e));
   });
 })();
