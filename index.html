@@ -7,15 +7,51 @@
   <meta name="description" content="Nexora is a next-generation platform that empowers businesses to build, scale, and innovate faster than ever before." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=2" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=4" />
 </head>
 <body>
-  <!-- Cursor follower -->
+  <!-- Page Loader -->
+  <div class="page-loader" id="pageLoader">
+    <div class="page-loader__inner">
+      <div class="page-loader__orbit">
+        <div class="page-loader__core"></div>
+        <div class="page-loader__satellite"></div>
+      </div>
+      <div class="page-loader__text">
+        <span>N</span><span>E</span><span>X</span><span>O</span><span>R</span><span>A</span>
+      </div>
+      <div class="page-loader__bar"><div class="page-loader__bar-fill" id="loaderBarFill"></div></div>
+      <div class="page-loader__caption">Initialising navigation systems</div>
+    </div>
+  </div>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot" id="cursorDot"></div>
+    <div class="cursor__ring" id="cursorRing"></div>
+  </div>
+
+  <!-- Cursor glow -->
   <div class="cursor-glow" id="cursorGlow"></div>
 
-  <!-- Noise overlay -->
+  <!-- Galaxy backdrop -->
+  <div class="galaxy" aria-hidden="true">
+    <div class="galaxy__nebula galaxy__nebula--1"></div>
+    <div class="galaxy__nebula galaxy__nebula--2"></div>
+    <div class="galaxy__nebula galaxy__nebula--3"></div>
+    <canvas class="galaxy__stars" id="starfieldCanvas"></canvas>
+    <div class="galaxy__shooting" id="shootingStars"></div>
+  </div>
+
+  <!-- Grain overlay -->
   <div class="noise-overlay"></div>
+
+  <!-- Side scroll-rail -->
+  <aside class="scroll-rail" id="scrollRail" aria-hidden="true">
+    <div class="scroll-rail__track"></div>
+    <div class="scroll-rail__items" id="scrollRailItems"></div>
+  </aside>
 
   <!-- Navigation -->
   <nav class="nav" id="nav">
@@ -23,17 +59,21 @@
       <a href="#" class="nav__logo" id="navLogo">
         <span class="nav__logo-icon">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+            <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#a78bfa"/><stop offset="0.55" stop-color="#7dd3fc"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
             <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#logoGrad)"/>
-            <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path d="M2 10C6 4 12 2 18 2H22C14 3 6 6 2 10Z" fill="white" opacity="0.2"/>
+            <path d="M10 23V9L22 23V9" stroke="#0a0a1f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
         </span>
         <span class="nav__logo-text">Nexora</span>
       </a>
       <div class="nav__links" id="navLinks"></div>
       <a href="/app/#login" class="nav__link nav__login-link">Login</a>
-      <a href="/app/#login" class="nav__cta btn btn--sm" id="navCta">Get Started</a>
+      <a href="/app/#login" class="nav__cta btn btn--primary btn--sm" id="navCta">
+        <span class="btn__label">Get Started</span>
+        <span class="btn__arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
       <button class="nav__burger" id="navBurger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -46,38 +86,66 @@
   </div>
 
   <!-- Hero -->
-  <section class="hero" id="hero">
+  <section class="hero" id="hero" data-rail="Home">
+    <!-- Hero orbital system: a central glow with concentric rings + orbiting points -->
+    <div class="hero__orbit" aria-hidden="true">
+      <div class="hero__core"></div>
+      <div class="hero__ring hero__ring--1"><span class="hero__satellite"></span></div>
+      <div class="hero__ring hero__ring--2"><span class="hero__satellite"></span></div>
+      <div class="hero__ring hero__ring--3"><span class="hero__satellite"></span></div>
+      <div class="hero__ring hero__ring--4"></div>
+    </div>
+
     <canvas class="hero__canvas" id="heroCanvas"></canvas>
     <div class="hero__gradient"></div>
+
     <div class="hero__content container">
       <div class="hero__badge reveal-up" id="heroBadge">
         <span class="hero__badge-dot"></span>
         <span>Introducing Nexora 2.0</span>
       </div>
-      <h1 class="hero__headline reveal-up" id="heroHeadline"></h1>
+      <h1 class="hero__headline" id="heroHeadline" data-split></h1>
       <p class="hero__sub reveal-up" id="heroSub"></p>
       <div class="hero__actions reveal-up">
-        <a href="#pricing" class="btn btn--primary btn--lg" id="heroPrimaryCta">Start Free Trial</a>
+        <a href="#pricing" class="btn btn--primary btn--lg" id="heroPrimaryCta">
+          <span class="btn__label">Start Free Trial</span>
+          <span class="btn__arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
         <a href="#" class="btn btn--ghost btn--lg" id="heroSecondaryCta">
           <span class="btn__play-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><polygon points="6,3 18,10 6,17"/></svg>
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><polygon points="6,3 18,10 6,17"/></svg>
           </span>
-          Watch Demo
+          <span class="btn__label">Watch Demo</span>
         </a>
       </div>
       <div class="hero__stats" id="heroStats"></div>
     </div>
     <div class="hero__scroll-indicator">
+      <span class="hero__scroll-label">Scroll</span>
       <div class="hero__scroll-line"></div>
     </div>
   </section>
 
+  <!-- Constellation divider (subtle line + dots) -->
+  <div class="constellation" aria-hidden="true">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <line x1="0" y1="30" x2="1200" y2="30" stroke="rgba(167,139,250,0.18)" stroke-width="1" stroke-dasharray="4 8" />
+      <circle cx="180" cy="30" r="2.5" fill="#a78bfa" />
+      <circle cx="420" cy="30" r="1.5" fill="#7dd3fc" />
+      <circle cx="600" cy="30" r="3"   fill="#fff" />
+      <circle cx="820" cy="30" r="1.5" fill="#22d3ee" />
+      <circle cx="1020" cy="30" r="2"  fill="#c084fc" />
+    </svg>
+  </div>
+
   <!-- About -->
-  <section class="section about" id="about">
+  <section class="section about" id="about" data-rail="About">
     <div class="container">
       <div class="section__header">
         <span class="badge reveal-up" id="aboutBadge">Why Nexora</span>
-        <h2 class="section__title reveal-up" id="aboutHeadline"></h2>
+        <h2 class="section__title" id="aboutHeadline" data-split></h2>
         <p class="section__desc reveal-up" id="aboutDesc"></p>
       </div>
       <div class="about__grid" id="aboutGrid"></div>
@@ -85,11 +153,11 @@
   </section>
 
   <!-- Features -->
-  <section class="section features" id="features">
+  <section class="section features" id="features" data-rail="Features">
     <div class="container">
       <div class="section__header">
         <span class="badge reveal-up" id="featuresBadge">Features</span>
-        <h2 class="section__title reveal-up" id="featuresHeadline"></h2>
+        <h2 class="section__title" id="featuresHeadline" data-split></h2>
         <p class="section__desc reveal-up" id="featuresDesc"></p>
       </div>
       <div class="features__grid" id="featuresGrid"></div>
@@ -97,11 +165,11 @@
   </section>
 
   <!-- How It Works -->
-  <section class="section how-it-works" id="how-it-works">
+  <section class="section how-it-works" id="how-it-works" data-rail="Process">
     <div class="container">
       <div class="section__header">
         <span class="badge reveal-up" id="hiwBadge">How It Works</span>
-        <h2 class="section__title reveal-up" id="hiwHeadline"></h2>
+        <h2 class="section__title" id="hiwHeadline" data-split></h2>
         <p class="section__desc reveal-up" id="hiwDesc"></p>
       </div>
       <div class="hiw__timeline" id="hiwTimeline"></div>
@@ -109,11 +177,11 @@
   </section>
 
   <!-- Testimonials -->
-  <section class="section testimonials" id="testimonials">
+  <section class="section testimonials" id="testimonials" data-rail="Voices">
     <div class="container">
       <div class="section__header">
         <span class="badge reveal-up" id="testBadge">Testimonials</span>
-        <h2 class="section__title reveal-up" id="testHeadline"></h2>
+        <h2 class="section__title" id="testHeadline" data-split></h2>
       </div>
       <div class="testimonials__track-wrapper reveal-up">
         <div class="testimonials__track" id="testTrack"></div>
@@ -123,11 +191,11 @@
   </section>
 
   <!-- Pricing -->
-  <section class="section pricing" id="pricing">
+  <section class="section pricing" id="pricing" data-rail="Pricing">
     <div class="container">
       <div class="section__header">
         <span class="badge reveal-up" id="pricingBadge">Pricing</span>
-        <h2 class="section__title reveal-up" id="pricingHeadline"></h2>
+        <h2 class="section__title" id="pricingHeadline" data-split></h2>
         <p class="section__desc reveal-up" id="pricingDesc"></p>
       </div>
       <div class="pricing__grid" id="pricingGrid"></div>
@@ -140,6 +208,7 @@
       <div class="cta-section__inner reveal-up">
         <div class="cta-section__orb cta-section__orb--1"></div>
         <div class="cta-section__orb cta-section__orb--2"></div>
+        <div class="cta-section__stars"></div>
         <h2 class="cta-section__headline" id="ctaHeadline"></h2>
         <p class="cta-section__desc" id="ctaDesc"></p>
         <div class="cta-section__actions">
@@ -151,11 +220,11 @@
   </section>
 
   <!-- Contact -->
-  <section class="section contact" id="contact">
+  <section class="section contact" id="contact" data-rail="Contact">
     <div class="container">
       <div class="section__header">
         <span class="badge reveal-up" id="contactBadge">Contact</span>
-        <h2 class="section__title reveal-up" id="contactHeadline"></h2>
+        <h2 class="section__title" id="contactHeadline" data-split></h2>
         <p class="section__desc reveal-up" id="contactDesc"></p>
       </div>
       <div class="contact__grid reveal-up">
@@ -170,7 +239,12 @@
           <div class="form-group">
             <textarea placeholder="Your Message" rows="5" required class="form-input"></textarea>
           </div>
-          <button type="submit" class="btn btn--primary btn--lg btn--full">Send Message</button>
+          <button type="submit" class="btn btn--primary btn--lg btn--full">
+            <span class="btn__label">Send Message</span>
+            <span class="btn__arrow">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </button>
         </form>
       </div>
     </div>
@@ -178,16 +252,16 @@
 
   <!-- Footer -->
   <footer class="footer" id="footer">
+    <div class="footer__glow"></div>
     <div class="container">
       <div class="footer__top">
         <div class="footer__brand">
           <a href="#" class="nav__logo">
             <span class="nav__logo-icon">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <defs><linearGradient id="logoGrad2" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+                <defs><linearGradient id="logoGrad2" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#a78bfa"/><stop offset="0.55" stop-color="#7dd3fc"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
                 <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#logoGrad2)"/>
-                <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                <path d="M2 10C6 4 12 2 18 2H22C14 3 6 6 2 10Z" fill="white" opacity="0.2"/>
+                <path d="M10 23V9L22 23V9" stroke="#0a0a1f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
               </svg>
             </span>
             <span class="nav__logo-text">Nexora</span>
@@ -199,6 +273,10 @@
       </div>
       <div class="footer__bottom">
         <p id="footerCopyright"></p>
+        <p class="footer__location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Crafted across the cosmos
+        </p>
       </div>
     </div>
   </footer>
@@ -210,9 +288,9 @@
       <button class="role-modal__close" id="roleClose">&times;</button>
       <div class="role-modal__icon">
         <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
-          <defs><linearGradient id="lgRole" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="0.5" stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+          <defs><linearGradient id="lgRole" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#a78bfa"/><stop offset="0.55" stop-color="#7dd3fc"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
           <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#lgRole)"/>
-          <path d="M10 23V9L22 23V9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M10 23V9L22 23V9" stroke="#0a0a1f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
       </div>
       <h2 class="role-modal__title">What best describes your role?</h2>
@@ -288,6 +366,6 @@
   </div>
 
   <script src="js/content.js?v=3"></script>
-  <script src="js/main.js?v=3"></script>
+  <script src="js/main.js?v=5"></script>
 </body>
 </html>

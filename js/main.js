@@ -1,14 +1,16 @@
 /* ============================================
-   NEXORA — Main JavaScript
-   Particles · Scroll Reveals · Parallax · Magnetic Cursor · Content Rendering
+   NEXORA — Galaxy Edition JS
+   Loader · Cursor · Starfield · Shooting Stars · Constellation Particles
+   Split Text · Scroll Rail · Magnetic · Tilt · Content Rendering
    ============================================ */
 
 ;(function () {
   "use strict";
 
+  const PREFERS_REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const IS_TOUCH = window.matchMedia("(pointer: coarse)").matches;
+
   // ---- Content ----
-  // Starts from the localStorage cache (or DEFAULT_CONTENT) so the first paint
-  // is instant; the init flow swaps in fresh server data and re-renders.
   let C = ContentManager.getCachedContent();
 
   // ---- Icon SVGs ----
@@ -31,8 +33,80 @@
     linkedin: `<svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
   };
 
-  function getIcon(name) {
-    return ICONS[name] || ICONS.zap;
+  function getIcon(name) { return ICONS[name] || ICONS.zap; }
+
+  // Words to italicize inside the hero headline (last match per line wins).
+  const ACCENT_WORDS = ["results", "innovation", "future", "smarter", "faster", "reimagined", "deliver"];
+
+  function applyAccentItalic(headlineEl, text) {
+    const lines = text.split(/\n/);
+    const html = lines.map((line) => {
+      const words = line.split(/\s+/);
+      let accentIdx = -1;
+      for (let i = words.length - 1; i >= 0; i--) {
+        const clean = words[i].replace(/[.,!?;:]/g, "").toLowerCase();
+        if (ACCENT_WORDS.includes(clean)) { accentIdx = i; break; }
+      }
+      return words
+        .map((w, i) => i === accentIdx ? `<em class="accent-italic">${w}</em>` : w)
+        .join(" ");
+    }).join("<br>");
+    headlineEl.innerHTML = html;
+  }
+
+  // Split text into per-word wrappers for line-clip slide-up reveal
+  function splitTextIntoWords(el) {
+    const wrap = (textNode) => {
+      const text = textNode.nodeValue;
+      if (!text || !text.trim()) return null;
+      const frag = document.createDocumentFragment();
+      const parts = text.split(/(\s+)/);
+      parts.forEach((part) => {
+        if (/^\s+$/.test(part)) {
+          frag.appendChild(document.createTextNode(part));
+        } else if (part.length) {
+          const wWrap = document.createElement("span");
+          wWrap.className = "split-word";
+          const wInner = document.createElement("span");
+          wInner.className = "split-word__inner";
+          wInner.textContent = part;
+          wWrap.appendChild(wInner);
+          frag.appendChild(wWrap);
+        }
+      });
+      return frag;
+    };
+
+    const walk = (node) => {
+      const kids = Array.from(node.childNodes);
+      kids.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const frag = wrap(child);
+          if (frag) child.parentNode.replaceChild(frag, child);
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          if (child.classList && child.classList.contains("accent-italic")) {
+            const wWrap = document.createElement("span");
+            wWrap.className = "split-word";
+            const wInner = document.createElement("span");
+            wInner.className = "split-word__inner";
+            child.parentNode.insertBefore(wWrap, child);
+            wInner.appendChild(child);
+            wWrap.appendChild(wInner);
+          } else if (child.tagName === "BR") {
+            /* keep */
+          } else {
+            walk(child);
+          }
+        }
+      });
+    };
+
+    walk(el);
+
+    const words = el.querySelectorAll(".split-word__inner");
+    words.forEach((w, i) => {
+      w.style.transitionDelay = `${0.05 * i + 0.05}s`;
+    });
   }
 
   // ============================================
@@ -40,7 +114,6 @@
   // ============================================
 
   function renderContent() {
-    // Nav
     const navLinks = document.getElementById("navLinks");
     navLinks.innerHTML = C.nav.links
       .map((l) => `<a href="${l.href}" class="nav__link">${l.label}</a>`)
@@ -49,28 +122,27 @@
     const mobileMenuLinks = document.getElementById("mobileMenuLinks");
     mobileMenuLinks.innerHTML = C.nav.links
       .map((l) => `<a href="${l.href}" class="mobile-menu__link">${l.label}</a>`)
-      .join("") + `<a href="/app/#login" class="mobile-menu__link" style="color:var(--accent-1)">Login</a>`;
+      .join("") + `<a href="/app/#login" class="mobile-menu__link" style="color:var(--nebula-violet)">Login</a>`;
 
     // Hero
     document.getElementById("heroBadge").innerHTML = `<span class="hero__badge-dot"></span><span>${C.hero.badge}</span>`;
-    document.getElementById("heroHeadline").textContent = C.hero.headline;
+
+    const heroHeadline = document.getElementById("heroHeadline");
+    applyAccentItalic(heroHeadline, C.hero.headline);
+
     document.getElementById("heroSub").textContent = C.hero.subheadline;
-    document.getElementById("heroPrimaryCta").textContent = C.hero.primaryCta;
+    document.getElementById("heroPrimaryCta").querySelector(".btn__label").textContent = C.hero.primaryCta;
     document.getElementById("heroPrimaryCta").href = C.hero.primaryCtaHref;
-    document.getElementById("heroSecondaryCta").querySelector("span:last-child") ||
-      (document.getElementById("heroSecondaryCta").innerHTML =
-        `<span class="btn__play-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><polygon points="6,3 18,10 6,17"/></svg></span>${C.hero.secondaryCta}`);
+    document.getElementById("heroSecondaryCta").querySelector(".btn__label").textContent = C.hero.secondaryCta;
     document.getElementById("heroSecondaryCta").href = C.hero.secondaryCtaHref;
 
     const heroStats = document.getElementById("heroStats");
     heroStats.innerHTML = C.hero.stats
-      .map(
-        (s) => `
+      .map((s) => `
       <div class="hero__stat">
         <div class="hero__stat-value">${s.value}</div>
         <div class="hero__stat-label">${s.label}</div>
-      </div>`
-      )
+      </div>`)
       .join("");
 
     // About
@@ -79,14 +151,12 @@
     document.getElementById("aboutDesc").textContent = C.about.description;
     const aboutGrid = document.getElementById("aboutGrid");
     aboutGrid.innerHTML = C.about.highlights
-      .map(
-        (h) => `
+      .map((h) => `
       <div class="about__card reveal-up">
         <div class="about__card-icon">${getIcon(h.icon)}</div>
         <h3 class="about__card-title">${h.title}</h3>
         <p class="about__card-desc">${h.description}</p>
-      </div>`
-      )
+      </div>`)
       .join("");
 
     // Features
@@ -95,14 +165,13 @@
     document.getElementById("featuresDesc").textContent = C.features.description;
     const featuresGrid = document.getElementById("featuresGrid");
     featuresGrid.innerHTML = C.features.items
-      .map(
-        (f) => `
+      .map((f) => `
       <div class="feature-card reveal-up" style="--card-accent: ${f.color}">
-        <div class="feature-card__icon" style="color: ${f.color}">${getIcon(f.icon)}</div>
+        <div class="feature-card__shine"></div>
+        <div class="feature-card__icon">${getIcon(f.icon)}</div>
         <h3 class="feature-card__title">${f.title}</h3>
         <p class="feature-card__desc">${f.description}</p>
-      </div>`
-      )
+      </div>`)
       .join("");
 
     // How It Works
@@ -113,14 +182,12 @@
     hiwTimeline.innerHTML =
       `<div class="hiw__timeline-progress" id="hiwProgress"></div>` +
       C.howItWorks.steps
-        .map(
-          (s) => `
+        .map((s) => `
       <div class="hiw__step">
         <div class="hiw__step-number">${s.number}</div>
         <h3 class="hiw__step-title">${s.title}</h3>
         <p class="hiw__step-desc">${s.description}</p>
-      </div>`
-        )
+      </div>`)
         .join("");
 
     // Testimonials
@@ -128,8 +195,7 @@
     document.getElementById("testHeadline").textContent = C.testimonials.headline;
     const testTrack = document.getElementById("testTrack");
     testTrack.innerHTML = C.testimonials.items
-      .map(
-        (t) => `
+      .map((t) => `
       <div class="testimonial-card">
         <p class="testimonial-card__quote">${t.quote}</p>
         <div class="testimonial-card__author">
@@ -139,16 +205,13 @@
             <div class="testimonial-card__role">${t.role}</div>
           </div>
         </div>
-      </div>`
-      )
+      </div>`)
       .join("");
 
     const testDots = document.getElementById("testDots");
     testDots.innerHTML = C.testimonials.items
-      .map(
-        (_, i) =>
-          `<button class="testimonials__dot${i === 0 ? " active" : ""}" data-index="${i}" aria-label="Testimonial ${i + 1}"></button>`
-      )
+      .map((_, i) =>
+        `<button class="testimonials__dot${i === 0 ? " active" : ""}" data-index="${i}" aria-label="Testimonial ${i + 1}"></button>`)
       .join("");
 
     // Pricing
@@ -157,8 +220,7 @@
     document.getElementById("pricingDesc").textContent = C.pricing.description;
     const pricingGrid = document.getElementById("pricingGrid");
     pricingGrid.innerHTML = C.pricing.plans
-      .map(
-        (p) => `
+      .map((p) => `
       <div class="pricing-card${p.highlighted ? " pricing-card--highlighted" : ""} reveal-up">
         ${p.highlighted ? '<div class="pricing-card__popular">Most Popular</div>' : ""}
         <div class="pricing-card__name">${p.name}</div>
@@ -171,8 +233,7 @@
           ${p.features.map((f) => `<li>${f}</li>`).join("")}
         </ul>
         <a href="#" class="btn ${p.highlighted ? "btn--primary" : "btn--ghost"} btn--full">${p.cta}</a>
-      </div>`
-      )
+      </div>`)
       .join("");
 
     // CTA
@@ -208,31 +269,266 @@
 
     const footerSocials = document.getElementById("footerSocials");
     footerSocials.innerHTML = C.footer.socials
-      .map(
-        (s) =>
-          `<a href="${s.href}" class="footer__social-link" aria-label="${s.platform}">${getIcon(s.platform)}</a>`
-      )
+      .map((s) =>
+        `<a href="${s.href}" class="footer__social-link" aria-label="${s.platform}">${getIcon(s.platform)}</a>`)
       .join("");
 
     const footerColumns = document.getElementById("footerColumns");
     footerColumns.innerHTML = C.footer.columns
-      .map(
-        (col) => `
+      .map((col) => `
       <div>
         <h4 class="footer__col-title">${col.title}</h4>
         <div class="footer__col-links">
           ${col.links.map((l) => `<a href="${l.href}" class="footer__col-link">${l.label}</a>`).join("")}
         </div>
-      </div>`
-      )
+      </div>`)
       .join("");
+
+    // Split-text: re-split on every render (textContent overwrites children).
+    // If parent already in viewport, reveal immediately so words don't get stuck.
+    document.querySelectorAll("[data-split]").forEach((el) => {
+      splitTextIntoWords(el);
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.querySelectorAll(".split-word").forEach((w) => w.classList.add("is-visible"));
+      }
+    });
   }
 
   // ============================================
-  // PARTICLE CANVAS
+  // PAGE LOADER
   // ============================================
 
-  function initParticles() {
+  function initLoader() {
+    const loader = document.getElementById("pageLoader");
+    const bar = document.getElementById("loaderBarFill");
+    if (!loader || !bar) return;
+
+    let progress = 0;
+    const minDuration = 900;
+    const start = performance.now();
+
+    const tick = () => {
+      const target = 92;
+      progress += (target - progress) * 0.08;
+      bar.style.width = progress + "%";
+      if (progress < target - 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+
+    const finish = () => {
+      const elapsed = performance.now() - start;
+      const wait = Math.max(0, minDuration - elapsed);
+      setTimeout(() => {
+        bar.style.width = "100%";
+        setTimeout(() => {
+          loader.classList.add("is-hidden");
+          document.body.classList.add("loader-done");
+        }, 280);
+      }, wait);
+    };
+
+    if (document.readyState === "complete") finish();
+    else window.addEventListener("load", finish, { once: true });
+  }
+
+  // ============================================
+  // CUSTOM CURSOR (minimal, no labels)
+  // ============================================
+
+  function initCustomCursor() {
+    if (IS_TOUCH) return;
+    const cursor = document.getElementById("cursor");
+    const dot = document.getElementById("cursorDot");
+    const ring = document.getElementById("cursorRing");
+    if (!cursor || !dot || !ring) return;
+
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let dx = mx, dy = my;
+    let rx = mx, ry = my;
+
+    document.addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; });
+    document.addEventListener("mousedown", () => cursor.classList.add("is-press"));
+    document.addEventListener("mouseup",   () => cursor.classList.remove("is-press"));
+
+    function loop() {
+      dx += (mx - dx) * 0.5;
+      dy += (my - dy) * 0.5;
+      rx += (mx - rx) * 0.16;
+      ry += (my - ry) * 0.16;
+
+      dot.style.transform  = `translate(${dx}px, ${dy}px) translate(-50%, -50%)`;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    const HOVER_SEL = 'a, button, .btn, [role="button"], .testimonials__dot, .role-option, .scroll-rail__item, input, textarea';
+    const TEXT_SEL = 'input, textarea, [contenteditable]';
+
+    document.addEventListener("mouseover", (e) => {
+      const t = e.target.closest(HOVER_SEL);
+      if (!t) return;
+      cursor.classList.add("is-hover");
+      if (t.matches(TEXT_SEL)) cursor.classList.add("is-text");
+    });
+
+    document.addEventListener("mouseout", (e) => {
+      const t = e.target.closest(HOVER_SEL);
+      if (!t) return;
+      cursor.classList.remove("is-hover", "is-text");
+    });
+
+    document.addEventListener("mouseleave", () => cursor.style.opacity = "0");
+    document.addEventListener("mouseenter", () => cursor.style.opacity = "1");
+  }
+
+  // ============================================
+  // STARFIELD (background canvas — twinkling stars w/ parallax)
+  // ============================================
+
+  function initStarfield() {
+    if (PREFERS_REDUCED) return;
+    const canvas = document.getElementById("starfieldCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    let w = 0, h = 0, dpr = 1;
+    let stars = [];
+    let scrollY = window.scrollY;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      buildStars();
+    }
+
+    function buildStars() {
+      const density = Math.min((w * h) / 6500, 260);
+      stars = [];
+      for (let i = 0; i < density; i++) {
+        const layer = Math.random() < 0.65 ? 1 : (Math.random() < 0.7 ? 2 : 3);
+        stars.push({
+          x: Math.random() * w,
+          // Distribute across taller virtual height so scroll parallax keeps stars
+          baseY: Math.random() * h * 3,
+          size: layer === 3 ? Math.random() * 1.6 + 0.8 : Math.random() * 1.1 + 0.3,
+          layer,
+          opacity: layer === 3 ? Math.random() * 0.3 + 0.5 : Math.random() * 0.4 + 0.15,
+          twinkleSpeed: Math.random() * 0.005 + 0.001,
+          twinklePhase: Math.random() * Math.PI * 2,
+          hue: Math.random() < 0.85 ? 0 : (Math.random() < 0.5 ? 260 : 200), // mostly white, some violet/cyan
+        });
+      }
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, w, h);
+
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        // Parallax by layer: closer layers move faster on scroll
+        const parallax = scrollY * (s.layer === 1 ? 0.05 : s.layer === 2 ? 0.15 : 0.3);
+        let y = (s.baseY - parallax) % (h * 3);
+        if (y < 0) y += h * 3;
+        // Only draw if in viewport
+        if (y > h + 20 || y < -20) continue;
+
+        const tw = 0.6 + Math.sin(t * s.twinkleSpeed + s.twinklePhase) * 0.4;
+        const alpha = s.opacity * tw;
+
+        ctx.beginPath();
+        ctx.arc(s.x, y, s.size, 0, Math.PI * 2);
+        if (s.hue === 0) {
+          ctx.fillStyle = `rgba(248, 250, 252, ${alpha})`;
+        } else if (s.hue === 260) {
+          ctx.fillStyle = `rgba(167, 139, 250, ${alpha})`;
+        } else {
+          ctx.fillStyle = `rgba(125, 211, 252, ${alpha})`;
+        }
+        ctx.fill();
+
+        // Glow halo for brighter stars
+        if (s.layer === 3) {
+          ctx.beginPath();
+          ctx.arc(s.x, y, s.size * 3, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(248, 250, 252, ${alpha * 0.08})`;
+          ctx.fill();
+        }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("scroll", () => { scrollY = window.scrollY; }, { passive: true });
+
+    resize();
+    requestAnimationFrame(draw);
+  }
+
+  // ============================================
+  // SHOOTING STARS (occasional CSS-driven streaks)
+  // ============================================
+
+  function initShootingStars() {
+    if (PREFERS_REDUCED) return;
+    const container = document.getElementById("shootingStars");
+    if (!container) return;
+
+    function spawn() {
+      const star = document.createElement("div");
+      star.className = "shooting-star";
+
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight * 0.5;
+      const angle = -25 - Math.random() * 25; // -25 to -50 degrees
+      const distance = window.innerWidth * 0.5 + Math.random() * 200;
+      const duration = 800 + Math.random() * 600;
+
+      star.style.left = startX + "px";
+      star.style.top = startY + "px";
+      star.style.transform = `rotate(${angle}deg) translateX(0)`;
+      star.style.opacity = "0";
+      star.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity ${duration}ms ease-out`;
+
+      container.appendChild(star);
+
+      requestAnimationFrame(() => {
+        star.style.opacity = "1";
+        star.style.transform = `rotate(${angle}deg) translateX(${distance}px)`;
+      });
+
+      setTimeout(() => {
+        star.style.opacity = "0";
+      }, duration * 0.7);
+
+      setTimeout(() => star.remove(), duration + 200);
+    }
+
+    function schedule() {
+      const delay = 4500 + Math.random() * 7000;
+      setTimeout(() => {
+        if (!document.hidden) spawn();
+        schedule();
+      }, delay);
+    }
+
+    // Kick off after a short pause so it doesn't fight the loader
+    setTimeout(schedule, 3000);
+  }
+
+  // ============================================
+  // HERO CONSTELLATION PARTICLES (subtle network)
+  // ============================================
+
+  function initHeroParticles() {
+    if (PREFERS_REDUCED) return;
     const canvas = document.getElementById("heroCanvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -243,33 +539,31 @@
     function resize() {
       canvas.width = canvas.offsetWidth * devicePixelRatio;
       canvas.height = canvas.offsetHeight * devicePixelRatio;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(devicePixelRatio, devicePixelRatio);
     }
 
     class Particle {
-      constructor() {
-        this.reset();
-      }
+      constructor() { this.reset(); }
       reset() {
         this.x = Math.random() * canvas.offsetWidth;
         this.y = Math.random() * canvas.offsetHeight;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = (Math.random() - 0.5) * 0.4;
-        this.speedY = (Math.random() - 0.5) * 0.4;
-        this.opacity = Math.random() * 0.5 + 0.1;
+        this.size = Math.random() * 1.6 + 0.4;
+        this.speedX = (Math.random() - 0.5) * 0.25;
+        this.speedY = (Math.random() - 0.5) * 0.25;
+        this.opacity = Math.random() * 0.4 + 0.15;
       }
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // mouse repulsion
         const dx = this.x - mouse.x;
         const dy = this.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 120) {
           const force = (120 - dist) / 120;
-          this.x += (dx / dist) * force * 2;
-          this.y += (dy / dist) * force * 2;
+          this.x += (dx / dist) * force * 1.8;
+          this.y += (dy / dist) * force * 1.8;
         }
 
         if (this.x < 0 || this.x > canvas.offsetWidth) this.speedX *= -1;
@@ -278,14 +572,14 @@
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
+        ctx.fillStyle = `rgba(167, 139, 250, ${this.opacity})`;
         ctx.fill();
       }
     }
 
     function init() {
       resize();
-      const count = Math.min(Math.floor((canvas.offsetWidth * canvas.offsetHeight) / 8000), 150);
+      const count = Math.min(Math.floor((canvas.offsetWidth * canvas.offsetHeight) / 10000), 110);
       particles = Array.from({ length: count }, () => new Particle());
     }
 
@@ -299,7 +593,7 @@
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(99, 102, 241, ${0.06 * (1 - dist / 150)})`;
+            ctx.strokeStyle = `rgba(167, 139, 250, ${0.06 * (1 - dist / 150)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -309,10 +603,7 @@
 
     function animate() {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
-      particles.forEach((p) => {
-        p.update();
-        p.draw();
-      });
+      particles.forEach((p) => { p.update(); p.draw(); });
       drawLines();
       rafId = requestAnimationFrame(animate);
     }
@@ -323,10 +614,7 @@
       mouse.y = e.clientY - rect.top;
     });
 
-    canvas.addEventListener("mouseleave", () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
-    });
+    canvas.addEventListener("mouseleave", () => { mouse.x = -1000; mouse.y = -1000; });
 
     window.addEventListener("resize", () => {
       cancelAnimationFrame(rafId);
@@ -344,22 +632,16 @@
 
   function initCursorGlow() {
     const glow = document.getElementById("cursorGlow");
-    if (!glow || window.matchMedia("(pointer: coarse)").matches) return;
+    if (!glow || IS_TOUCH) return;
 
-    let cx = -1000,
-      cy = -1000,
-      gx = -1000,
-      gy = -1000;
+    let cx = -1000, cy = -1000, gx = -1000, gy = -1000;
 
-    document.addEventListener("mousemove", (e) => {
-      cx = e.clientX;
-      cy = e.clientY;
-    });
+    document.addEventListener("mousemove", (e) => { cx = e.clientX; cy = e.clientY; });
 
     function tick() {
-      gx += (cx - gx) * 0.08;
-      gy += (cy - gy) * 0.08;
-      glow.style.transform = `translate(${gx - 300}px, ${gy - 300}px)`;
+      gx += (cx - gx) * 0.06;
+      gy += (cy - gy) * 0.06;
+      glow.style.transform = `translate(${gx - 260}px, ${gy - 260}px)`;
       requestAnimationFrame(tick);
     }
     tick();
@@ -374,16 +656,67 @@
     bar.className = "scroll-progress";
     document.body.prepend(bar);
 
-    window.addEventListener(
-      "scroll",
-      () => {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = docHeight > 0 ? scrollTop / docHeight : 0;
-        bar.style.transform = `scaleX(${progress})`;
+    window.addEventListener("scroll", () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+      bar.style.transform = `scaleX(${progress})`;
+    }, { passive: true });
+  }
+
+  // ============================================
+  // SCROLL RAIL
+  // ============================================
+
+  function initScrollRail() {
+    if (window.innerWidth < 1080) return;
+    const rail = document.getElementById("scrollRail");
+    const railItems = document.getElementById("scrollRailItems");
+    if (!rail || !railItems) return;
+
+    const sections = Array.from(document.querySelectorAll("[data-rail]"));
+    if (!sections.length) return;
+
+    railItems.innerHTML = sections.map((s, i) => `
+      <button class="scroll-rail__item${i === 0 ? " is-active" : ""}" data-target="${s.id}">
+        <span class="scroll-rail__dot"></span>
+        <span class="scroll-rail__label">${s.dataset.rail}</span>
+      </button>
+    `).join("");
+
+    railItems.querySelectorAll(".scroll-rail__item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = document.getElementById(btn.dataset.target);
+        if (t) t.scrollIntoView({ behavior: "smooth" });
+      });
+    });
+
+    const items = railItems.querySelectorAll(".scroll-rail__item");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            items.forEach((it) => it.classList.toggle("is-active", it.dataset.target === id));
+          }
+        });
       },
-      { passive: true }
+      { threshold: 0.45, rootMargin: "-20% 0px -45% 0px" }
     );
+
+    sections.forEach((s) => observer.observe(s));
+
+    let raf = null;
+    const updateVisibility = () => {
+      raf = null;
+      rail.classList.toggle("is-visible", window.scrollY > window.innerHeight * 0.4);
+    };
+    window.addEventListener("scroll", () => {
+      if (raf) return;
+      raf = requestAnimationFrame(updateVisibility);
+    }, { passive: true });
+    updateVisibility();
   }
 
   // ============================================
@@ -395,23 +728,16 @@
     const burger = document.getElementById("navBurger");
     const mobileMenu = document.getElementById("mobileMenu");
 
-    window.addEventListener(
-      "scroll",
-      () => {
-        nav.classList.toggle("nav--scrolled", window.scrollY > 50);
-      },
-      { passive: true }
-    );
+    window.addEventListener("scroll", () => {
+      nav.classList.toggle("nav--scrolled", window.scrollY > 50);
+    }, { passive: true });
 
     burger.addEventListener("click", () => {
       burger.classList.toggle("active");
       mobileMenu.classList.toggle("active");
-      document.body.style.overflow = mobileMenu.classList.contains("active")
-        ? "hidden"
-        : "";
+      document.body.style.overflow = mobileMenu.classList.contains("active") ? "hidden" : "";
     });
 
-    // close mobile on link click
     mobileMenu.querySelectorAll("a").forEach((a) =>
       a.addEventListener("click", () => {
         burger.classList.remove("active");
@@ -420,7 +746,6 @@
       })
     );
 
-    // smooth scroll for nav links
     document.querySelectorAll('a[href^="#"]').forEach((a) =>
       a.addEventListener("click", (e) => {
         const target = document.querySelector(a.getAttribute("href"));
@@ -433,7 +758,7 @@
   }
 
   // ============================================
-  // SCROLL REVEAL (IntersectionObserver)
+  // SCROLL REVEAL
   // ============================================
 
   function initScrollReveal() {
@@ -446,14 +771,29 @@
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -60px 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
     );
 
     document.querySelectorAll(".reveal-up").forEach((el) => observer.observe(el));
+
+    const splitObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const words = entry.target.querySelectorAll(".split-word");
+            words.forEach((w) => w.classList.add("is-visible"));
+            splitObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
+    );
+
+    document.querySelectorAll("[data-split]").forEach((el) => splitObserver.observe(el));
   }
 
   // ============================================
-  // HOW IT WORKS — SCROLL-DRIVEN TIMELINE
+  // HOW IT WORKS TIMELINE
   // ============================================
 
   function initTimeline() {
@@ -465,9 +805,7 @@
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-          }
+          if (entry.isIntersecting) entry.target.classList.add("visible");
         });
       },
       { threshold: 0.3 }
@@ -475,18 +813,13 @@
 
     steps.forEach((s) => observer.observe(s));
 
-    // animate progress bar on scroll
-    window.addEventListener(
-      "scroll",
-      () => {
-        const rect = timeline.getBoundingClientRect();
-        const viewH = window.innerHeight;
-        if (rect.top > viewH || rect.bottom < 0) return;
-        const scrolled = Math.min(1, Math.max(0, (viewH - rect.top) / (rect.height + viewH * 0.3)));
-        progress.style.height = `${scrolled * 100}%`;
-      },
-      { passive: true }
-    );
+    window.addEventListener("scroll", () => {
+      const rect = timeline.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      if (rect.top > viewH || rect.bottom < 0) return;
+      const scrolled = Math.min(1, Math.max(0, (viewH - rect.top) / (rect.height + viewH * 0.3)));
+      progress.style.height = `${scrolled * 100}%`;
+    }, { passive: true });
   }
 
   // ============================================
@@ -507,12 +840,11 @@
       dots.forEach((d, idx) => d.classList.toggle("active", idx === current));
     }
 
-    function next() {
-      goTo((current + 1) % dots.length);
-    }
+    function next() { goTo((current + 1) % dots.length); }
 
     function startAuto() {
-      interval = setInterval(next, 5000);
+      clearInterval(interval);
+      interval = setInterval(next, 5500);
     }
 
     dots.forEach((dot) =>
@@ -523,7 +855,6 @@
       })
     );
 
-    // swipe support
     let startX;
     track.addEventListener("touchstart", (e) => {
       startX = e.touches[0].clientX;
@@ -542,28 +873,32 @@
   }
 
   // ============================================
-  // MAGNETIC HOVER ON BUTTONS
+  // MAGNETIC BUTTONS
   // ============================================
 
   function initMagnetic() {
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (IS_TOUCH) return;
 
-    document.querySelectorAll(".btn--primary, .btn--white").forEach((btn) => {
+    document.querySelectorAll(".btn--primary, .btn--white, .nav__cta").forEach((btn) => {
       btn.addEventListener("mousemove", (e) => {
         const rect = btn.getBoundingClientRect();
         const x = e.clientX - rect.left - rect.width / 2;
         const y = e.clientY - rect.top - rect.height / 2;
         btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+        const label = btn.querySelector(".btn__label");
+        if (label) label.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`;
       });
 
       btn.addEventListener("mouseleave", () => {
         btn.style.transform = "";
+        const label = btn.querySelector(".btn__label");
+        if (label) label.style.transform = "";
       });
     });
   }
 
   // ============================================
-  // CARD MOUSE TRACKING (radial gradient follows cursor)
+  // CARD MOUSE TRACKING
   // ============================================
 
   function initCardMouseTracking() {
@@ -574,33 +909,33 @@
         const y = ((e.clientY - rect.top) / rect.height) * 100;
         card.style.setProperty("--mouse-x", `${x}%`);
         card.style.setProperty("--mouse-y", `${y}%`);
+        card.style.setProperty("--shine-x", `${x}%`);
+        card.style.setProperty("--shine-y", `${y}%`);
       });
     });
   }
 
   // ============================================
-  // TILT EFFECT ON FEATURE CARDS
+  // FEATURE CARDS 3D TILT
   // ============================================
 
   function initTilt() {
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (IS_TOUCH) return;
 
     document.querySelectorAll(".feature-card").forEach((card) => {
       card.addEventListener("mousemove", (e) => {
         const rect = card.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width - 0.5;
         const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `translateY(-6px) perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+        card.style.transform = `translateY(-4px) perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg)`;
       });
 
-      card.addEventListener("mouseleave", () => {
-        card.style.transform = "";
-      });
+      card.addEventListener("mouseleave", () => { card.style.transform = ""; });
     });
   }
 
   // ============================================
-  // TEXT COUNTER ANIMATION (hero stats)
+  // STAT COUNTERS
   // ============================================
 
   function initCounters() {
@@ -613,21 +948,21 @@
           if (!entry.isIntersecting) return;
           const el = entry.target;
           const text = el.textContent;
-          const match = text.match(/^([\d.]+)(.*)$/);
+          const match = text.match(/^([<>]?)([\d.]+)(.*)$/);
           if (!match) return;
 
-          const target = parseFloat(match[1]);
-          const suffix = match[2];
+          const prefix = match[1];
+          const target = parseFloat(match[2]);
+          const suffix = match[3];
           const duration = 1500;
           const start = performance.now();
 
           function tick(now) {
             const elapsed = now - start;
             const progress = Math.min(elapsed / duration, 1);
-            // ease out cubic
             const ease = 1 - Math.pow(1 - progress, 3);
             const current = target * ease;
-            el.textContent =
+            el.textContent = prefix +
               (target % 1 !== 0 ? current.toFixed(1) : Math.floor(current)) + suffix;
             if (progress < 1) requestAnimationFrame(tick);
           }
@@ -643,28 +978,35 @@
   }
 
   // ============================================
-  // PARALLAX SUBTLE
+  // PARALLAX — hero content fade + slight orbit drift
   // ============================================
 
   function initParallax() {
     const hero = document.querySelector(".hero__content");
+    const orbit = document.querySelector(".hero__orbit");
     if (!hero) return;
 
-    window.addEventListener(
-      "scroll",
-      () => {
-        const scroll = window.scrollY;
-        if (scroll < window.innerHeight) {
-          hero.style.transform = `translateY(${scroll * 0.15}px)`;
-          hero.style.opacity = 1 - scroll / (window.innerHeight * 0.8);
+    let raf = null;
+    const update = () => {
+      raf = null;
+      const scroll = window.scrollY;
+      if (scroll < window.innerHeight) {
+        hero.style.transform = `translateY(${scroll * 0.15}px)`;
+        hero.style.opacity = Math.max(0, 1 - scroll / (window.innerHeight * 0.85));
+        if (orbit) {
+          orbit.style.transform = `translate(-50%, calc(-50% + ${scroll * 0.08}px)) scale(${1 - scroll / 6000})`;
         }
-      },
-      { passive: true }
-    );
+      }
+    };
+
+    window.addEventListener("scroll", () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    }, { passive: true });
   }
 
   // ============================================
-  // CONTACT FORM (mock)
+  // CONTACT FORM
   // ============================================
 
   function initContactForm() {
@@ -674,10 +1016,12 @@
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const btn = form.querySelector("button[type=submit]");
-      btn.textContent = "Sent!";
+      const label = btn.querySelector(".btn__label");
+      const original = label ? label.textContent : btn.textContent;
+      if (label) label.textContent = "Sent!"; else btn.textContent = "Sent!";
       btn.style.background = "linear-gradient(135deg, #22c55e, #16a34a)";
       setTimeout(() => {
-        btn.textContent = "Send Message";
+        if (label) label.textContent = original; else btn.textContent = original;
         btn.style.background = "";
         form.reset();
       }, 2500);
@@ -719,45 +1063,22 @@
       document.body.style.overflow = "";
     }
 
-    // Intercept all "Get Started" / "Start Free Trial" links that point to app.html
     document.addEventListener("click", (e) => {
       const link = e.target.closest('a[href*="/app/#login"]');
-      if (link && !link.closest(".role-modal")) {
-        openModal(e);
-      }
+      if (link && !link.closest(".role-modal")) openModal(e);
     });
 
-    // Close modal
     if (backdrop) backdrop.addEventListener("click", closeModal);
     if (closeBtn) closeBtn.addEventListener("click", closeModal);
 
-    // Role selection → redirect to app login
     if (options) {
       options.addEventListener("click", (e) => {
         const btn = e.target.closest(".role-option");
         if (!btn) return;
-
         const role = btn.dataset.role;
-
-        // Visual feedback
-        btn.style.background = "rgba(99, 102, 241, 0.15)";
-        btn.style.borderColor = "var(--accent-1)";
-
-        // Store selected role
+        btn.style.background = "rgba(167, 139, 250, 0.18)";
+        btn.style.borderColor = "var(--nebula-violet)";
         localStorage.setItem("nexora_onboard_role", role);
-
-        // Map role to default landing page in app
-        const rolePages = {
-          pm: "dashboard",
-          product: "okr",
-          pmo: "delivery",
-          developer: "kanban",
-          other: "dashboard",
-        };
-
-        const targetPage = rolePages[role] || "dashboard";
-
-        // Redirect to real pm-dashboard product
         setTimeout(() => {
           closeModal();
           window.location.href = "/app/#login";
@@ -765,7 +1086,6 @@
       });
     }
 
-    // ESC to close
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
     });
@@ -775,47 +1095,43 @@
   // INIT
   // ============================================
 
+  function runEffects() {
+    initScrollReveal();
+    initTimeline();
+    initCarousel();
+    initMagnetic();
+    initCardMouseTracking();
+    initTilt();
+    initCounters();
+    initParallax();
+    initContactForm();
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    initLoader();
+    initCustomCursor();
+
     renderContent();
-    initParticles();
+    initStarfield();
+    initShootingStars();
+    initHeroParticles();
     initCursorGlow();
     initScrollProgress();
     initNav();
 
-    // small delay to let DOM settle after rendering
     requestAnimationFrame(() => {
-      initScrollReveal();
-      initTimeline();
-      initCarousel();
-      initMagnetic();
-      initCardMouseTracking();
-      initTilt();
-      initCounters();
-      initParallax();
-      initContactForm();
+      runEffects();
+      initScrollRail();
       addCmsLink();
       initRoleModal();
     });
 
-    // Pull fresh content from the API in the background. If it differs from
-    // the cached version, re-render so visitors see the latest CMS edits
-    // without waiting for a second page load.
     ContentManager.fetchContent()
       .then((fresh) => {
         if (JSON.stringify(fresh) === JSON.stringify(C)) return;
         C = fresh;
         renderContent();
-        requestAnimationFrame(() => {
-          initScrollReveal();
-          initTimeline();
-          initCarousel();
-          initMagnetic();
-          initCardMouseTracking();
-          initTilt();
-          initCounters();
-          initParallax();
-          initContactForm();
-        });
+        requestAnimationFrame(runEffects);
       })
       .catch((e) => console.warn("CMS refresh failed:", e));
   });
