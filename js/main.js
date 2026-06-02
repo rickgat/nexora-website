@@ -1033,6 +1033,17 @@
   // ============================================
 
   function addCmsLink() {
+    // Local dev only — hide on production so the button never ships to visitors.
+    const host = window.location.hostname || "";
+    const isLocal =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "" ||                       // file:// or null host
+      host.startsWith("192.168.") ||
+      host.startsWith("10.") ||
+      host.endsWith(".local");
+    if (!isLocal) return;
+
     const link = document.createElement("a");
     link.href = "/cms/";
     link.className = "cms-link";
