@@ -1103,6 +1103,45 @@
   }
 
   // ============================================
+  // VIDEO DEMO MODAL
+  // ============================================
+
+  function initVideoModal() {
+    const modal = document.getElementById("videoModal");
+    const backdrop = document.getElementById("videoBackdrop");
+    const closeBtn = document.getElementById("videoClose");
+    const video = document.getElementById("videoPlayer");
+    const trigger = document.getElementById("heroSecondaryCta");
+    if (!modal || !video || !trigger) return;
+
+    function openModal(e) {
+      if (e) e.preventDefault();
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      try {
+        video.currentTime = 0;
+        const p = video.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch (_) {}
+    }
+
+    function closeModal() {
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      try { video.pause(); } catch (_) {}
+    }
+
+    trigger.addEventListener("click", openModal);
+    if (backdrop) backdrop.addEventListener("click", closeModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+    });
+  }
+
+  // ============================================
   // INIT
   // ============================================
 
@@ -1135,6 +1174,7 @@
       initScrollRail();
       addCmsLink();
       initRoleModal();
+      initVideoModal();
     });
 
     ContentManager.fetchContent()
