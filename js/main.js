@@ -1,7 +1,6 @@
 /* ============================================
-   NEXORA — Galaxy Edition JS
-   Loader · Cursor · Starfield · Shooting Stars · Constellation Particles
-   Split Text · Scroll Rail · Magnetic · Tilt · Content Rendering
+   NEXORA — Landing Refined Edition JS
+   Content rendering · Cinematic reveals · Elegant micro-interactions
    ============================================ */
 
 ;(function () {
@@ -13,12 +12,12 @@
   // ---- Content ----
   let C = ContentManager.getCachedContent();
 
-  // ---- Icon SVGs ----
+  // ---- Icon SVGs (stroked, matching pm-dashboard tokens) ----
   const ICONS = {
     shield: `<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
     zap: `<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
     globe: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-    puzzle: `<svg viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 1 0-3.214 3.214c.446.166.855.497.925.968a.979.979 0 0 1-.276.837l-1.611 1.611a2.407 2.407 0 0 1-1.704.706 2.407 2.407 0 0 1-1.704-.706l-1.568-1.568a1.026 1.026 0 0 0-.878-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 1 1-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 0 0-.289-.878l-1.568-1.568A2.407 2.407 0 0 1 1 12c0-.617.236-1.234.706-1.704L3.317 8.685a.98.98 0 0 1 .837-.276c.47.07.802.48.968.925a2.501 2.501 0 1 0 3.214-3.214c-.446-.166-.855-.497-.925-.968a.979.979 0 0 1 .276-.837l1.611-1.611A2.407 2.407 0 0 1 11 2.998c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.878.29.493-.074.84-.504 1.02-.968a2.5 2.5 0 1 1 3.237 3.237c-.464.18-.894.527-.967 1.02z"/></svg>`,
+    puzzle: `<svg viewBox="0 0 24 24"><path d="M19.4 7.9c-.05.32.06.65.29.88l1.57 1.57c.47.47.7 1.09.7 1.7s-.23 1.23-.7 1.7l-1.6 1.6a.98.98 0 0 1-.84.28c-.47-.07-.8-.48-.97-.93a2.5 2.5 0 1 0-3.2 3.2c.44.17.85.5.92.97a.98.98 0 0 1-.28.84L13.7 21.3a2.4 2.4 0 0 1-1.7.7 2.4 2.4 0 0 1-1.7-.7l-1.57-1.57a1 1 0 0 0-.88-.29c-.5.07-.84.5-1.02.97a2.5 2.5 0 1 1-3.24-3.24c.46-.18.9-.53.97-1.02a1 1 0 0 0-.29-.88L2.7 13.7A2.4 2.4 0 0 1 2 12c0-.62.24-1.23.7-1.7l1.62-1.62a.98.98 0 0 1 .84-.28c.47.07.8.48.97.93a2.5 2.5 0 1 0 3.2-3.2c-.44-.17-.85-.5-.92-.97a.98.98 0 0 1 .28-.84l1.6-1.6A2.4 2.4 0 0 1 11 3c.62 0 1.23.24 1.7.7l1.57 1.57c.23.23.56.34.88.29.5-.07.84-.5 1.02-.97a2.5 2.5 0 1 1 3.24 3.24c-.46.18-.9.53-.97 1.02z"/></svg>`,
     brain: `<svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4v1a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v1a3 3 0 0 0 3 3h1a4 4 0 0 0 8 0h1a3 3 0 0 0 3-3v-1a3 3 0 0 0 0-6v-1a3 3 0 0 0-3-3V6a4 4 0 0 0-4-4z"/><path d="M12 2v20"/></svg>`,
     workflow: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M6 9v3a3 3 0 0 0 3 3h3"/><path d="M15 12h-3"/></svg>`,
     layers: `<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
@@ -35,8 +34,10 @@
 
   function getIcon(name) { return ICONS[name] || ICONS.zap; }
 
-  // Words to italicize inside the hero headline (last match per line wins).
-  const ACCENT_WORDS = ["results", "innovation", "future", "smarter", "faster", "reimagined", "deliver"];
+  const ACCENT_WORDS = [
+    "results", "innovation", "future", "smarter", "faster",
+    "reimagined", "deliver", "one", "delivery", "learn", "talk", "trusted"
+  ];
 
   function applyAccentItalic(headlineEl, text) {
     const lines = text.split(/\n/);
@@ -54,7 +55,7 @@
     headlineEl.innerHTML = html;
   }
 
-  // Split text into per-word wrappers for line-clip slide-up reveal
+  // Split text into per-word spans for the line-clip slide-up reveal.
   function splitTextIntoWords(el) {
     const wrap = (textNode) => {
       const text = textNode.nodeValue;
@@ -93,7 +94,7 @@
             wInner.appendChild(child);
             wWrap.appendChild(wInner);
           } else if (child.tagName === "BR") {
-            /* keep */
+            /* keep line breaks intact */
           } else {
             walk(child);
           }
@@ -105,7 +106,7 @@
 
     const words = el.querySelectorAll(".split-word__inner");
     words.forEach((w, i) => {
-      w.style.transitionDelay = `${0.05 * i + 0.05}s`;
+      w.style.transitionDelay = `${0.06 * i + 0.05}s`;
     });
   }
 
@@ -122,10 +123,11 @@
     const mobileMenuLinks = document.getElementById("mobileMenuLinks");
     mobileMenuLinks.innerHTML = C.nav.links
       .map((l) => `<a href="${l.href}" class="mobile-menu__link">${l.label}</a>`)
-      .join("") + `<a href="/app/#login" class="mobile-menu__link" style="color:var(--nebula-violet)">Login</a>`;
+      .join("") + `<a href="/app/#login" class="mobile-menu__link" style="color:var(--indigo)">Login</a>`;
 
     // Hero
-    document.getElementById("heroBadge").innerHTML = `<span class="hero__badge-dot"></span><span>${C.hero.badge}</span>`;
+    const heroBadge = document.getElementById("heroBadge");
+    heroBadge.innerHTML = `<span class="hero__badge-dot"></span><span>${C.hero.badge}</span>`;
 
     const heroHeadline = document.getElementById("heroHeadline");
     applyAccentItalic(heroHeadline, C.hero.headline);
@@ -152,7 +154,7 @@
     const aboutGrid = document.getElementById("aboutGrid");
     aboutGrid.innerHTML = C.about.highlights
       .map((h) => `
-      <div class="about__card reveal-up">
+      <div class="about__card">
         <div class="about__card-icon">${getIcon(h.icon)}</div>
         <h3 class="about__card-title">${h.title}</h3>
         <p class="about__card-desc">${h.description}</p>
@@ -166,8 +168,7 @@
     const featuresGrid = document.getElementById("featuresGrid");
     featuresGrid.innerHTML = C.features.items
       .map((f) => `
-      <div class="feature-card reveal-up" style="--card-accent: ${f.color}">
-        <div class="feature-card__shine"></div>
+      <div class="feature-card">
         <div class="feature-card__icon">${getIcon(f.icon)}</div>
         <h3 class="feature-card__title">${f.title}</h3>
         <p class="feature-card__desc">${f.description}</p>
@@ -179,24 +180,22 @@
     document.getElementById("hiwHeadline").textContent = C.howItWorks.headline;
     document.getElementById("hiwDesc").textContent = C.howItWorks.description;
     const hiwTimeline = document.getElementById("hiwTimeline");
-    hiwTimeline.innerHTML =
-      `<div class="hiw__timeline-progress" id="hiwProgress"></div>` +
-      C.howItWorks.steps
-        .map((s) => `
+    hiwTimeline.innerHTML = C.howItWorks.steps
+      .map((s) => `
       <div class="hiw__step">
         <div class="hiw__step-number">${s.number}</div>
         <h3 class="hiw__step-title">${s.title}</h3>
         <p class="hiw__step-desc">${s.description}</p>
       </div>`)
-        .join("");
+      .join("");
 
-    // Testimonials
+    // Testimonials — cross-fade (absolute layered cards)
     document.getElementById("testBadge").textContent = C.testimonials.badge;
     document.getElementById("testHeadline").textContent = C.testimonials.headline;
     const testTrack = document.getElementById("testTrack");
     testTrack.innerHTML = C.testimonials.items
-      .map((t) => `
-      <div class="testimonial-card">
+      .map((t, i) => `
+      <div class="testimonial-card${i === 0 ? " is-active" : ""}" data-index="${i}">
         <p class="testimonial-card__quote">${t.quote}</p>
         <div class="testimonial-card__author">
           <div class="testimonial-card__avatar">${t.author.charAt(0)}</div>
@@ -221,7 +220,7 @@
     const pricingGrid = document.getElementById("pricingGrid");
     pricingGrid.innerHTML = C.pricing.plans
       .map((p) => `
-      <div class="pricing-card${p.highlighted ? " pricing-card--highlighted" : ""} reveal-up">
+      <div class="pricing-card${p.highlighted ? " pricing-card--highlighted" : ""}">
         ${p.highlighted ? '<div class="pricing-card__popular">Most Popular</div>' : ""}
         <div class="pricing-card__name">${p.name}</div>
         <div class="pricing-card__price">
@@ -232,7 +231,7 @@
         <ul class="pricing-card__features">
           ${p.features.map((f) => `<li>${f}</li>`).join("")}
         </ul>
-        <a href="#" class="btn ${p.highlighted ? "btn--primary" : "btn--ghost"} btn--full">${p.cta}</a>
+        <a href="#" class="btn ${p.highlighted ? "btn--white" : "btn--ghost"} btn--full">${p.cta}</a>
       </div>`)
       .join("");
 
@@ -285,442 +284,13 @@
       .join("");
 
     // Split-text: re-split on every render (textContent overwrites children).
-    // If parent already in viewport, reveal immediately so words don't get stuck.
     document.querySelectorAll("[data-split]").forEach((el) => {
       splitTextIntoWords(el);
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        el.querySelectorAll(".split-word").forEach((w) => w.classList.add("is-visible"));
-      }
     });
   }
 
   // ============================================
-  // PAGE LOADER
-  // ============================================
-
-  function initLoader() {
-    const loader = document.getElementById("pageLoader");
-    const bar = document.getElementById("loaderBarFill");
-    if (!loader || !bar) return;
-
-    let progress = 0;
-    const minDuration = 900;
-    const start = performance.now();
-
-    const tick = () => {
-      const target = 92;
-      progress += (target - progress) * 0.08;
-      bar.style.width = progress + "%";
-      if (progress < target - 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-
-    const finish = () => {
-      const elapsed = performance.now() - start;
-      const wait = Math.max(0, minDuration - elapsed);
-      setTimeout(() => {
-        bar.style.width = "100%";
-        setTimeout(() => {
-          loader.classList.add("is-hidden");
-          document.body.classList.add("loader-done");
-        }, 280);
-      }, wait);
-    };
-
-    if (document.readyState === "complete") finish();
-    else window.addEventListener("load", finish, { once: true });
-  }
-
-  // ============================================
-  // CUSTOM CURSOR (minimal, no labels)
-  // ============================================
-
-  function initCustomCursor() {
-    if (IS_TOUCH) return;
-    const cursor = document.getElementById("cursor");
-    const dot = document.getElementById("cursorDot");
-    const ring = document.getElementById("cursorRing");
-    if (!cursor || !dot || !ring) return;
-
-    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    let dx = mx, dy = my;
-    let rx = mx, ry = my;
-
-    document.addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; });
-    document.addEventListener("mousedown", () => cursor.classList.add("is-press"));
-    document.addEventListener("mouseup",   () => cursor.classList.remove("is-press"));
-
-    function loop() {
-      dx += (mx - dx) * 0.5;
-      dy += (my - dy) * 0.5;
-      rx += (mx - rx) * 0.16;
-      ry += (my - ry) * 0.16;
-
-      dot.style.transform  = `translate(${dx}px, ${dy}px) translate(-50%, -50%)`;
-      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
-      requestAnimationFrame(loop);
-    }
-    loop();
-
-    const HOVER_SEL = 'a, button, .btn, [role="button"], .testimonials__dot, .role-option, .scroll-rail__item, input, textarea';
-    const TEXT_SEL = 'input, textarea, [contenteditable]';
-
-    document.addEventListener("mouseover", (e) => {
-      const t = e.target.closest(HOVER_SEL);
-      if (!t) return;
-      cursor.classList.add("is-hover");
-      if (t.matches(TEXT_SEL)) cursor.classList.add("is-text");
-    });
-
-    document.addEventListener("mouseout", (e) => {
-      const t = e.target.closest(HOVER_SEL);
-      if (!t) return;
-      cursor.classList.remove("is-hover", "is-text");
-    });
-
-    document.addEventListener("mouseleave", () => cursor.style.opacity = "0");
-    document.addEventListener("mouseenter", () => cursor.style.opacity = "1");
-  }
-
-  // ============================================
-  // STARFIELD (background canvas — twinkling stars w/ parallax)
-  // ============================================
-
-  function initStarfield() {
-    if (PREFERS_REDUCED) return;
-    const canvas = document.getElementById("starfieldCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-
-    let w = 0, h = 0, dpr = 1;
-    let stars = [];
-    let scrollY = window.scrollY;
-
-    function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = window.innerWidth;
-      h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
-      buildStars();
-    }
-
-    function buildStars() {
-      const density = Math.min((w * h) / 6500, 260);
-      stars = [];
-      for (let i = 0; i < density; i++) {
-        const layer = Math.random() < 0.65 ? 1 : (Math.random() < 0.7 ? 2 : 3);
-        stars.push({
-          x: Math.random() * w,
-          // Distribute across taller virtual height so scroll parallax keeps stars
-          baseY: Math.random() * h * 3,
-          size: layer === 3 ? Math.random() * 1.6 + 0.8 : Math.random() * 1.1 + 0.3,
-          layer,
-          opacity: layer === 3 ? Math.random() * 0.3 + 0.5 : Math.random() * 0.4 + 0.15,
-          twinkleSpeed: Math.random() * 0.005 + 0.001,
-          twinklePhase: Math.random() * Math.PI * 2,
-          hue: Math.random() < 0.85 ? 0 : (Math.random() < 0.5 ? 260 : 200), // mostly white, some violet/cyan
-        });
-      }
-    }
-
-    function draw(t) {
-      ctx.clearRect(0, 0, w, h);
-
-      for (let i = 0; i < stars.length; i++) {
-        const s = stars[i];
-        // Parallax by layer: closer layers move faster on scroll
-        const parallax = scrollY * (s.layer === 1 ? 0.05 : s.layer === 2 ? 0.15 : 0.3);
-        let y = (s.baseY - parallax) % (h * 3);
-        if (y < 0) y += h * 3;
-        // Only draw if in viewport
-        if (y > h + 20 || y < -20) continue;
-
-        const tw = 0.6 + Math.sin(t * s.twinkleSpeed + s.twinklePhase) * 0.4;
-        const alpha = s.opacity * tw;
-
-        ctx.beginPath();
-        ctx.arc(s.x, y, s.size, 0, Math.PI * 2);
-        if (s.hue === 0) {
-          ctx.fillStyle = `rgba(248, 250, 252, ${alpha})`;
-        } else if (s.hue === 260) {
-          ctx.fillStyle = `rgba(167, 139, 250, ${alpha})`;
-        } else {
-          ctx.fillStyle = `rgba(125, 211, 252, ${alpha})`;
-        }
-        ctx.fill();
-
-        // Glow halo for brighter stars
-        if (s.layer === 3) {
-          ctx.beginPath();
-          ctx.arc(s.x, y, s.size * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(248, 250, 252, ${alpha * 0.08})`;
-          ctx.fill();
-        }
-      }
-
-      requestAnimationFrame(draw);
-    }
-
-    window.addEventListener("resize", resize);
-    window.addEventListener("scroll", () => { scrollY = window.scrollY; }, { passive: true });
-
-    resize();
-    requestAnimationFrame(draw);
-  }
-
-  // ============================================
-  // SHOOTING STARS (occasional CSS-driven streaks)
-  // ============================================
-
-  function initShootingStars() {
-    if (PREFERS_REDUCED) return;
-    const container = document.getElementById("shootingStars");
-    if (!container) return;
-
-    function spawn() {
-      const star = document.createElement("div");
-      star.className = "shooting-star";
-
-      const startX = Math.random() * window.innerWidth;
-      const startY = Math.random() * window.innerHeight * 0.5;
-      const angle = -25 - Math.random() * 25; // -25 to -50 degrees
-      const distance = window.innerWidth * 0.5 + Math.random() * 200;
-      const duration = 800 + Math.random() * 600;
-
-      star.style.left = startX + "px";
-      star.style.top = startY + "px";
-      star.style.transform = `rotate(${angle}deg) translateX(0)`;
-      star.style.opacity = "0";
-      star.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity ${duration}ms ease-out`;
-
-      container.appendChild(star);
-
-      requestAnimationFrame(() => {
-        star.style.opacity = "1";
-        star.style.transform = `rotate(${angle}deg) translateX(${distance}px)`;
-      });
-
-      setTimeout(() => {
-        star.style.opacity = "0";
-      }, duration * 0.7);
-
-      setTimeout(() => star.remove(), duration + 200);
-    }
-
-    function schedule() {
-      const delay = 4500 + Math.random() * 7000;
-      setTimeout(() => {
-        if (!document.hidden) spawn();
-        schedule();
-      }, delay);
-    }
-
-    // Kick off after a short pause so it doesn't fight the loader
-    setTimeout(schedule, 3000);
-  }
-
-  // ============================================
-  // HERO CONSTELLATION PARTICLES (subtle network)
-  // ============================================
-
-  function initHeroParticles() {
-    if (PREFERS_REDUCED) return;
-    const canvas = document.getElementById("heroCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let particles = [];
-    let mouse = { x: -1000, y: -1000 };
-    let rafId;
-
-    function resize() {
-      canvas.width = canvas.offsetWidth * devicePixelRatio;
-      canvas.height = canvas.offsetHeight * devicePixelRatio;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(devicePixelRatio, devicePixelRatio);
-    }
-
-    class Particle {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * canvas.offsetWidth;
-        this.y = Math.random() * canvas.offsetHeight;
-        this.size = Math.random() * 1.6 + 0.4;
-        this.speedX = (Math.random() - 0.5) * 0.25;
-        this.speedY = (Math.random() - 0.5) * 0.25;
-        this.opacity = Math.random() * 0.4 + 0.15;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        const dx = this.x - mouse.x;
-        const dy = this.y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          const force = (120 - dist) / 120;
-          this.x += (dx / dist) * force * 1.8;
-          this.y += (dy / dist) * force * 1.8;
-        }
-
-        if (this.x < 0 || this.x > canvas.offsetWidth) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.offsetHeight) this.speedY *= -1;
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(167, 139, 250, ${this.opacity})`;
-        ctx.fill();
-      }
-    }
-
-    function init() {
-      resize();
-      const count = Math.min(Math.floor((canvas.offsetWidth * canvas.offsetHeight) / 10000), 110);
-      particles = Array.from({ length: count }, () => new Particle());
-    }
-
-    function drawLines() {
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 150) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(167, 139, 250, ${0.06 * (1 - dist / 150)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
-      particles.forEach((p) => { p.update(); p.draw(); });
-      drawLines();
-      rafId = requestAnimationFrame(animate);
-    }
-
-    canvas.addEventListener("mousemove", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    });
-
-    canvas.addEventListener("mouseleave", () => { mouse.x = -1000; mouse.y = -1000; });
-
-    window.addEventListener("resize", () => {
-      cancelAnimationFrame(rafId);
-      init();
-      animate();
-    });
-
-    init();
-    animate();
-  }
-
-  // ============================================
-  // CURSOR GLOW
-  // ============================================
-
-  function initCursorGlow() {
-    const glow = document.getElementById("cursorGlow");
-    if (!glow || IS_TOUCH) return;
-
-    let cx = -1000, cy = -1000, gx = -1000, gy = -1000;
-
-    document.addEventListener("mousemove", (e) => { cx = e.clientX; cy = e.clientY; });
-
-    function tick() {
-      gx += (cx - gx) * 0.06;
-      gy += (cy - gy) * 0.06;
-      glow.style.transform = `translate(${gx - 260}px, ${gy - 260}px)`;
-      requestAnimationFrame(tick);
-    }
-    tick();
-  }
-
-  // ============================================
-  // SCROLL PROGRESS BAR
-  // ============================================
-
-  function initScrollProgress() {
-    const bar = document.createElement("div");
-    bar.className = "scroll-progress";
-    document.body.prepend(bar);
-
-    window.addEventListener("scroll", () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? scrollTop / docHeight : 0;
-      bar.style.transform = `scaleX(${progress})`;
-    }, { passive: true });
-  }
-
-  // ============================================
-  // SCROLL RAIL
-  // ============================================
-
-  function initScrollRail() {
-    if (window.innerWidth < 1080) return;
-    const rail = document.getElementById("scrollRail");
-    const railItems = document.getElementById("scrollRailItems");
-    if (!rail || !railItems) return;
-
-    const sections = Array.from(document.querySelectorAll("[data-rail]"));
-    if (!sections.length) return;
-
-    railItems.innerHTML = sections.map((s, i) => `
-      <button class="scroll-rail__item${i === 0 ? " is-active" : ""}" data-target="${s.id}">
-        <span class="scroll-rail__dot"></span>
-        <span class="scroll-rail__label">${s.dataset.rail}</span>
-      </button>
-    `).join("");
-
-    railItems.querySelectorAll(".scroll-rail__item").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const t = document.getElementById(btn.dataset.target);
-        if (t) t.scrollIntoView({ behavior: "smooth" });
-      });
-    });
-
-    const items = railItems.querySelectorAll(".scroll-rail__item");
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            items.forEach((it) => it.classList.toggle("is-active", it.dataset.target === id));
-          }
-        });
-      },
-      { threshold: 0.45, rootMargin: "-20% 0px -45% 0px" }
-    );
-
-    sections.forEach((s) => observer.observe(s));
-
-    let raf = null;
-    const updateVisibility = () => {
-      raf = null;
-      rail.classList.toggle("is-visible", window.scrollY > window.innerHeight * 0.4);
-    };
-    window.addEventListener("scroll", () => {
-      if (raf) return;
-      raf = requestAnimationFrame(updateVisibility);
-    }, { passive: true });
-    updateVisibility();
-  }
-
-  // ============================================
-  // NAVIGATION SCROLL
+  // NAV — shrink on scroll + mobile menu
   // ============================================
 
   function initNav() {
@@ -728,217 +298,104 @@
     const burger = document.getElementById("navBurger");
     const mobileMenu = document.getElementById("mobileMenu");
 
-    window.addEventListener("scroll", () => {
-      nav.classList.toggle("nav--scrolled", window.scrollY > 50);
-    }, { passive: true });
+    const onScroll = () => {
+      nav.classList.toggle("is-scrolled", window.scrollY > 20);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
     burger.addEventListener("click", () => {
-      burger.classList.toggle("active");
-      mobileMenu.classList.toggle("active");
-      document.body.style.overflow = mobileMenu.classList.contains("active") ? "hidden" : "";
+      const open = burger.classList.toggle("is-open");
+      mobileMenu.classList.toggle("is-open", open);
+      document.body.style.overflow = open ? "hidden" : "";
     });
 
-    mobileMenu.querySelectorAll("a").forEach((a) =>
-      a.addEventListener("click", () => {
-        burger.classList.remove("active");
-        mobileMenu.classList.remove("active");
+    mobileMenu.addEventListener("click", (e) => {
+      if (e.target.closest("a")) {
+        burger.classList.remove("is-open");
+        mobileMenu.classList.remove("is-open");
         document.body.style.overflow = "";
-      })
-    );
+      }
+    });
 
-    document.querySelectorAll('a[href^="#"]').forEach((a) =>
-      a.addEventListener("click", (e) => {
-        const target = document.querySelector(a.getAttribute("href"));
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: "smooth" });
-        }
-      })
-    );
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const href = a.getAttribute("href");
+      if (href.length < 2) return;
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+    });
   }
 
   // ============================================
-  // SCROLL REVEAL
+  // SCROLL PROGRESS BAR
   // ============================================
 
-  function initScrollReveal() {
+  function initScrollProgress() {
+    const bar = document.getElementById("scrollProgress");
+    if (!bar) return;
+    const update = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+      bar.style.width = (progress * 100).toFixed(2) + "%";
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+  }
+
+  // ============================================
+  // CINEMATIC REVEALS (IntersectionObserver)
+  // ============================================
+
+  function initReveals() {
+    // Skip animation if user prefers reduced motion — mark everything visible.
+    if (PREFERS_REDUCED) {
+      document.querySelectorAll(".reveal, .reveal-stagger").forEach((el) => el.classList.add("is-visible"));
+      document.querySelectorAll(".split-word").forEach((w) => w.classList.add("is-visible"));
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
+            entry.target.classList.add("is-visible");
             observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
     );
 
-    document.querySelectorAll(".reveal-up").forEach((el) => observer.observe(el));
+    document.querySelectorAll(".reveal, .reveal-stagger").forEach((el) => observer.observe(el));
 
+    // Split-word reveal — separate observer with a slightly earlier trigger for headlines.
     const splitObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const words = entry.target.querySelectorAll(".split-word");
-            words.forEach((w) => w.classList.add("is-visible"));
+            entry.target.querySelectorAll(".split-word").forEach((w) => w.classList.add("is-visible"));
             splitObserver.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.2, rootMargin: "0px 0px -4% 0px" }
     );
 
     document.querySelectorAll("[data-split]").forEach((el) => splitObserver.observe(el));
   }
 
   // ============================================
-  // HOW IT WORKS TIMELINE
-  // ============================================
-
-  function initTimeline() {
-    const steps = document.querySelectorAll(".hiw__step");
-    const progress = document.getElementById("hiwProgress");
-    const timeline = document.querySelector(".hiw__timeline");
-    if (!timeline || !progress || !steps.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("visible");
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    steps.forEach((s) => observer.observe(s));
-
-    window.addEventListener("scroll", () => {
-      const rect = timeline.getBoundingClientRect();
-      const viewH = window.innerHeight;
-      if (rect.top > viewH || rect.bottom < 0) return;
-      const scrolled = Math.min(1, Math.max(0, (viewH - rect.top) / (rect.height + viewH * 0.3)));
-      progress.style.height = `${scrolled * 100}%`;
-    }, { passive: true });
-  }
-
-  // ============================================
-  // TESTIMONIALS CAROUSEL
-  // ============================================
-
-  function initCarousel() {
-    const track = document.getElementById("testTrack");
-    const dots = document.querySelectorAll(".testimonials__dot");
-    if (!track || !dots.length) return;
-
-    let current = 0;
-    let interval;
-
-    function goTo(i) {
-      current = i;
-      track.style.transform = `translateX(-${current * 100}%)`;
-      dots.forEach((d, idx) => d.classList.toggle("active", idx === current));
-    }
-
-    function next() { goTo((current + 1) % dots.length); }
-
-    function startAuto() {
-      clearInterval(interval);
-      interval = setInterval(next, 5500);
-    }
-
-    dots.forEach((dot) =>
-      dot.addEventListener("click", () => {
-        clearInterval(interval);
-        goTo(parseInt(dot.dataset.index));
-        startAuto();
-      })
-    );
-
-    let startX;
-    track.addEventListener("touchstart", (e) => {
-      startX = e.touches[0].clientX;
-      clearInterval(interval);
-    }, { passive: true });
-
-    track.addEventListener("touchend", (e) => {
-      const diff = startX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 50) {
-        diff > 0 ? goTo(Math.min(current + 1, dots.length - 1)) : goTo(Math.max(current - 1, 0));
-      }
-      startAuto();
-    }, { passive: true });
-
-    startAuto();
-  }
-
-  // ============================================
-  // MAGNETIC BUTTONS
-  // ============================================
-
-  function initMagnetic() {
-    if (IS_TOUCH) return;
-
-    document.querySelectorAll(".btn--primary, .btn--white, .nav__cta").forEach((btn) => {
-      btn.addEventListener("mousemove", (e) => {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
-        const label = btn.querySelector(".btn__label");
-        if (label) label.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`;
-      });
-
-      btn.addEventListener("mouseleave", () => {
-        btn.style.transform = "";
-        const label = btn.querySelector(".btn__label");
-        if (label) label.style.transform = "";
-      });
-    });
-  }
-
-  // ============================================
-  // CARD MOUSE TRACKING
-  // ============================================
-
-  function initCardMouseTracking() {
-    document.querySelectorAll(".about__card, .feature-card").forEach((card) => {
-      card.addEventListener("mousemove", (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        card.style.setProperty("--mouse-x", `${x}%`);
-        card.style.setProperty("--mouse-y", `${y}%`);
-        card.style.setProperty("--shine-x", `${x}%`);
-        card.style.setProperty("--shine-y", `${y}%`);
-      });
-    });
-  }
-
-  // ============================================
-  // FEATURE CARDS 3D TILT
-  // ============================================
-
-  function initTilt() {
-    if (IS_TOUCH) return;
-
-    document.querySelectorAll(".feature-card").forEach((card) => {
-      card.addEventListener("mousemove", (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `translateY(-4px) perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg)`;
-      });
-
-      card.addEventListener("mouseleave", () => { card.style.transform = ""; });
-    });
-  }
-
-  // ============================================
-  // STAT COUNTERS
+  // NUMBER COUNTERS — count up when stats enter viewport
   // ============================================
 
   function initCounters() {
+    if (PREFERS_REDUCED) return;
     const stats = document.querySelectorAll(".hero__stat-value");
     if (!stats.length) return;
 
@@ -949,22 +406,22 @@
           const el = entry.target;
           const text = el.textContent;
           const match = text.match(/^([<>]?)([\d.]+)(.*)$/);
-          if (!match) return;
+          if (!match) { observer.unobserve(el); return; }
 
           const prefix = match[1];
           const target = parseFloat(match[2]);
           const suffix = match[3];
-          const duration = 1500;
+          const duration = 1400;
           const start = performance.now();
 
           function tick(now) {
             const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const ease = 1 - Math.pow(1 - progress, 3);
-            const current = target * ease;
+            const p = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            const current = target * eased;
             el.textContent = prefix +
               (target % 1 !== 0 ? current.toFixed(1) : Math.floor(current)) + suffix;
-            if (progress < 1) requestAnimationFrame(tick);
+            if (p < 1) requestAnimationFrame(tick);
           }
 
           requestAnimationFrame(tick);
@@ -978,35 +435,93 @@
   }
 
   // ============================================
-  // PARALLAX — hero content fade + slight orbit drift
+  // TESTIMONIALS — cross-fade
   // ============================================
 
-  function initParallax() {
-    const hero = document.querySelector(".hero__content");
-    const orbit = document.querySelector(".hero__orbit");
-    if (!hero) return;
+  function initTestimonials() {
+    const cards = document.querySelectorAll(".testimonial-card");
+    const dots = document.querySelectorAll(".testimonials__dot");
+    if (!cards.length || !dots.length) return;
 
-    let raf = null;
-    const update = () => {
-      raf = null;
-      const scroll = window.scrollY;
-      if (scroll < window.innerHeight) {
-        hero.style.transform = `translateY(${scroll * 0.15}px)`;
-        hero.style.opacity = Math.max(0, 1 - scroll / (window.innerHeight * 0.85));
-        if (orbit) {
-          orbit.style.transform = `translate(-50%, calc(-50% + ${scroll * 0.08}px)) scale(${1 - scroll / 6000})`;
-        }
-      }
-    };
+    let current = 0;
+    let timer;
 
-    window.addEventListener("scroll", () => {
-      if (raf) return;
-      raf = requestAnimationFrame(update);
-    }, { passive: true });
+    function goTo(i) {
+      current = (i + cards.length) % cards.length;
+      cards.forEach((c, idx) => c.classList.toggle("is-active", idx === current));
+      dots.forEach((d, idx) => d.classList.toggle("active", idx === current));
+    }
+
+    function startAuto() {
+      clearInterval(timer);
+      timer = setInterval(() => goTo(current + 1), 6000);
+    }
+
+    dots.forEach((d) => d.addEventListener("click", () => {
+      goTo(parseInt(d.dataset.index, 10));
+      startAuto();
+    }));
+
+    // Touch swipe
+    const wrapper = document.querySelector(".testimonials__track-wrapper");
+    if (wrapper) {
+      let startX;
+      wrapper.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+        clearInterval(timer);
+      }, { passive: true });
+      wrapper.addEventListener("touchend", (e) => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
+        startAuto();
+      }, { passive: true });
+    }
+
+    startAuto();
   }
 
   // ============================================
-  // CONTACT FORM
+  // HERO MOCKUP — subtle mouse-follow parallax
+  // ============================================
+
+  function initMockupParallax() {
+    if (IS_TOUCH || PREFERS_REDUCED) return;
+    const mockup = document.getElementById("heroMockup");
+    const frame = document.getElementById("heroMockupFrame");
+    if (!mockup || !frame) return;
+
+    let targetRX = 0, targetRY = 0;
+    let currentRX = -4, currentRY = 2; // rest pose matches CSS
+    let raf = null;
+
+    function onMove(e) {
+      const rect = mockup.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / window.innerWidth;
+      const dy = (e.clientY - cy) / window.innerHeight;
+      // Ease around rest pose (-4deg Y, 2deg X). Max deviation ~4deg.
+      targetRY = -4 + dx * 4;
+      targetRX = 2 + -dy * 3;
+      if (!raf) raf = requestAnimationFrame(loop);
+    }
+
+    function loop() {
+      currentRY += (targetRY - currentRY) * 0.08;
+      currentRX += (targetRX - currentRX) * 0.08;
+      frame.style.transform = `rotateY(${currentRY.toFixed(2)}deg) rotateX(${currentRX.toFixed(2)}deg)`;
+      if (Math.abs(targetRY - currentRY) > 0.02 || Math.abs(targetRX - currentRX) > 0.02) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = null;
+      }
+    }
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+  }
+
+  // ============================================
+  // CONTACT FORM (demo submit)
   // ============================================
 
   function initContactForm() {
@@ -1019,37 +534,13 @@
       const label = btn.querySelector(".btn__label");
       const original = label ? label.textContent : btn.textContent;
       if (label) label.textContent = "Sent!"; else btn.textContent = "Sent!";
-      btn.style.background = "linear-gradient(135deg, #22c55e, #16a34a)";
+      btn.style.background = "linear-gradient(135deg, #16A34A, #22c55e)";
       setTimeout(() => {
         if (label) label.textContent = original; else btn.textContent = original;
         btn.style.background = "";
         form.reset();
       }, 2500);
     });
-  }
-
-  // ============================================
-  // CMS LINK
-  // ============================================
-
-  function addCmsLink() {
-    // Local dev only — hide on production so the button never ships to visitors.
-    const host = window.location.hostname || "";
-    const isLocal =
-      host === "localhost" ||
-      host === "127.0.0.1" ||
-      host === "" ||                       // file:// or null host
-      host.startsWith("192.168.") ||
-      host.startsWith("10.") ||
-      host.endsWith(".local");
-    if (!isLocal) return;
-
-    const link = document.createElement("a");
-    link.href = "/cms/";
-    link.className = "cms-link";
-    link.textContent = "CMS";
-    link.title = "Open Content Management System";
-    document.body.appendChild(link);
   }
 
   // ============================================
@@ -1065,12 +556,12 @@
 
     function openModal(e) {
       e.preventDefault();
-      modal.classList.add("open");
+      modal.classList.add("is-open");
       document.body.style.overflow = "hidden";
     }
 
     function closeModal() {
-      modal.classList.remove("open");
+      modal.classList.remove("is-open");
       document.body.style.overflow = "";
     }
 
@@ -1087,8 +578,8 @@
         const btn = e.target.closest(".role-option");
         if (!btn) return;
         const role = btn.dataset.role;
-        btn.style.background = "rgba(167, 139, 250, 0.18)";
-        btn.style.borderColor = "var(--nebula-violet)";
+        btn.style.background = "var(--indigo-soft)";
+        btn.style.borderColor = "var(--indigo)";
         localStorage.setItem("nexora_onboard_role", role);
         setTimeout(() => {
           closeModal();
@@ -1098,7 +589,7 @@
     }
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
     });
   }
 
@@ -1116,7 +607,7 @@
 
     function openModal(e) {
       if (e) e.preventDefault();
-      modal.classList.add("open");
+      modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
       try {
@@ -1127,7 +618,7 @@
     }
 
     function closeModal() {
-      modal.classList.remove("open");
+      modal.classList.remove("is-open");
       modal.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
       try { video.pause(); } catch (_) {}
@@ -1137,7 +628,7 @@
     if (backdrop) backdrop.addEventListener("click", closeModal);
     if (closeBtn) closeBtn.addEventListener("click", closeModal);
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
     });
   }
 
@@ -1146,43 +637,37 @@
   // ============================================
 
   function runEffects() {
-    initScrollReveal();
-    initTimeline();
-    initCarousel();
-    initMagnetic();
-    initCardMouseTracking();
-    initTilt();
+    initReveals();
+    initTestimonials();
     initCounters();
-    initParallax();
+    initMockupParallax();
     initContactForm();
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    initLoader();
-    initCustomCursor();
-
     renderContent();
-    initStarfield();
-    initShootingStars();
-    initHeroParticles();
-    initCursorGlow();
-    initScrollProgress();
     initNav();
+    initScrollProgress();
 
+    // Body fade-in
     requestAnimationFrame(() => {
+      document.body.classList.add("is-ready");
       runEffects();
-      initScrollRail();
-      addCmsLink();
       initRoleModal();
       initVideoModal();
     });
 
+    // Async CMS refresh — re-render if server content differs from cache.
     ContentManager.fetchContent()
       .then((fresh) => {
         if (JSON.stringify(fresh) === JSON.stringify(C)) return;
         C = fresh;
         renderContent();
-        requestAnimationFrame(runEffects);
+        requestAnimationFrame(() => {
+          initReveals();
+          initTestimonials();
+          initCounters();
+        });
       })
       .catch((e) => console.warn("CMS refresh failed:", e));
   });
